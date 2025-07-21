@@ -27,19 +27,19 @@
             display: flex; /* Usar flexbox para el layout interno */
             flex-direction: column;
             height: 600px; /* Altura fija para el contenedor del chat */
-    animation: popIn 0.7s;
-}
+            animation: popIn 0.7s;
+        }
 
-@keyframes popIn {
-    0% {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
         .chat-header {
             background-color: #2196F3; /* Azul para el encabezado */
             color: white;
@@ -152,209 +152,217 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <!-- Icono del chatbot -->
             <img src="logo.jpg" alt="Icono de Syncronix" onerror="this.onerror=null;this.src='https://placehold.co/30x30/cccccc/333333?text=Bot';" />
             Syncronix - Tu Asistente Virtual
         </div>
         <div class="chat-box" id="chatBox">
-            <!-- Mensajes del chat irán aquí -->
-            <div class="message syncronix-message">¡Hola! Soy Syncronix, tu asistente virtual. Estoy aquí para ayudarte con lo que necesites.</div>
-        </div>
+            </div>
         <div class="chat-input">
-            <input type="text" id="userInput" placeholder="Escribe tu mensaje..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">Enviar</button>
+            <input type="text" id="userInput" placeholder="Escribe tu mensaje..." onkeypress="handleInitialInput(event)">
+            <button onclick="handleInitialInput({key: 'Enter'})">Enviar</button>
         </div>
-  <input type="date" id="calendarInput" style="display:none;" />
+        <input type="date" id="calendarInput" style="display:none;" />
     </div>
 
-    
-<script>
-    const chatBox = document.getElementById('chatBox');
-    const userInput = document.getElementById('userInput');
-    const calendarInput = document.getElementById('calendarInput');
+    <script>
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const calendarInput = document.getElementById('calendarInput');
 
-// Cuando Syncronix pida la fecha:
-function showCalendar() {
-    calendarInput.style.display = 'block';
-    calendarInput.focus();
-    calendarInput.value = '';
-    calendarInput.onchange = function() {
-        if (calendarInput.value) {
-            tempDate = calendarInput.value.split('-').reverse().join('/');
-            appendMessage('user', tempDate);
-            calendarInput.style.display = 'none';
-            pendingDate = false;
-            if (!tempTime) {
-                pendingTime = true;
-                appendMessage('syncronix', '¿A qué hora? (ejemplo: 3 PM o 15:00)');
-            }
+        let userName = '';
+        let expectingName = true; // Nuevo estado para controlar si esperamos el nombre del usuario
+
+        // Cuando Syncronix pida la fecha:
+        function showCalendar() {
+            calendarInput.style.display = 'block';
+            calendarInput.focus();
+            calendarInput.value = '';
+            calendarInput.onchange = function() {
+                if (calendarInput.value) {
+                    tempDate = calendarInput.value.split('-').reverse().join('/');
+                    appendMessage('user', tempDate);
+                    calendarInput.style.display = 'none';
+                    pendingDate = false;
+                    if (!tempTime) {
+                        pendingTime = true;
+                        appendMessage('syncronix', '¿A qué hora? (ejemplo: 3 PM o 15:00)');
+                    }
+                }
+            };
         }
-    };
-}
 
-    let userName = '';
+        function appendMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'syncronix-message');
+            messageDiv.textContent = text;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
-    function askUserName() {
-        appendMessage('syncronix', '¡Hola! ¿Cómo te llamas?');
-        userInput.placeholder = "Escribe tu nombre...";
-        userInput.onkeypress = function(event) {
-            if (event.key === 'Enter') {
+        function resetStates() {
+            schedulingMeeting = false;
+            schedulingAlarm = false;
+            pendingDate = false;
+            pendingTime = false;
+            tempType = "";
+            tempDate = "";
+            tempTime = "";
+        }
+
+        // Variables de estado
+        let schedulingMeeting = false;
+        let schedulingAlarm = false;
+        let pendingDate = false;
+        let pendingTime = false;
+        let tempType = ""; // "reunion" o "alarma"
+        let tempDate = "";
+        let tempTime = "";
+
+        // Nueva función para manejar el input inicial (el nombre)
+        function handleInitialInput(event) {
+            if (event.key === 'Enter' || event.type === 'click') { // Agrega event.type === 'click' para el botón
                 const name = userInput.value.trim();
-                if (name) {
+                if (name && expectingName) {
                     userName = name;
                     appendMessage('user', userName);
                     appendMessage('syncronix', `¡Bienvenido, ${userName}! ¿En qué puedo ayudarte hoy?`);
                     userInput.value = '';
                     userInput.placeholder = "Escribe tu mensaje...";
-                    userInput.disabled = false;
-                    userInput.onkeypress = handleKeyPress; // Esto es correcto
-                    userInput.focus(); // <-- Añade esto para enfocar el campo tras la bienvenida
+                    expectingName = false; // Ya no esperamos el nombre
+                    userInput.onkeypress = handleKeyPress; // Reasignar a la función de manejo normal
+                    document.querySelector('.chat-input button').onclick = sendMessage; // Reasignar el clic del botón
+                    userInput.focus();
+                } else if (!expectingName) {
+                    sendMessage(); // Si ya no esperamos el nombre, procede con la lógica normal
                 }
             }
-        };
-    }
-
-    // Llama a esta función al cargar la página:
-    window.onload = function() {
-            askUserName();
-    };
-
-    // Variables de estado
-    let schedulingMeeting = false;
-    let schedulingAlarm = false;
-    let pendingDate = false;
-    let pendingTime = false;
-    let tempType = ""; // "reunion" o "alarma"
-    let tempDate = "";
-    let tempTime = "";
-
-    function appendMessage(sender, text) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'syncronix-message');
-        messageDiv.textContent = text;
-        chatBox.appendChild(messageDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function resetStates() {
-        schedulingMeeting = false;
-        schedulingAlarm = false;
-        pendingDate = false;
-        pendingTime = false;
-        tempType = "";
-        tempDate = "";
-        tempTime = "";
-    }
-
-    function sendMessage() {
-        const userText = userInput.value.trim();
-        if (userText === '') return;
-
-        appendMessage('user', userText);
-        userInput.value = '';
-
-        const lowerCaseText = userText.toLowerCase();
-
-        // Pregunta por hora o fecha
-        if (
-            lowerCaseText.includes('que hora es hoy') || lowerCaseText.includes('que hora es') ||
-            lowerCaseText.includes('la hora actual') || lowerCaseText.includes('que fecha es hoy') ||
-            lowerCaseText.includes('que fecha es') || lowerCaseText.includes('la fecha actual') ||
-            lowerCaseText.includes('quiero saber la hora') ||
-            lowerCaseText.includes('me gustaria saber la hora') || 
-            lowerCaseText.includes('dime la hora') ||
-            lowerCaseText.includes('hora actual') 
-        ) {
-            const now = new Date();
-            const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-            const timeString = now.toLocaleTimeString('es-VE', timeOptions);
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dateString = now.toLocaleDateString('es-VE', dateOptions);
-            appendMessage('syncronix', `Son las ${timeString} del ${dateString}.`);
-            resetStates();
         }
-        // Proceso de agendar reunión o alarma (flujo guiado)
-        else if (pendingDate || pendingTime) {
-            // Extraer fecha y hora si están pendientes
-            let dateMatch = userText.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})|(\d{4}-\d{2}-\d{2})|(\d{1,2} de [a-záéíóú]+( de \d{4})?)/i);
-            let timeMatch = userText.match(/(\d{1,2}(:\d{2})?\s*(am|pm)?)|(a las \d{1,2}(:\d{2})?\s*(am|pm)?)/i);
 
-            if (pendingDate && dateMatch) {
-                tempDate = dateMatch[0];
-                pendingDate = false;
-            }
-            if (pendingTime && timeMatch) {
-                tempTime = timeMatch[0].replace('a las ', '').trim();
-                pendingTime = false;
-            }
+        function sendMessage() {
+            const userText = userInput.value.trim();
+            if (userText === '') return;
 
-            // Si falta alguno, preguntar por lo que falta
-            if (!tempDate && (tempType === "reunion" || tempType === "alarma")) {
-                pendingDate = true;
-                appendMessage('syncronix', '¿Para que dia? Selecciona una fecha en el calendario:');
-                showCalendar();
-            } else if (!tempTime && (tempType === "reunion" || tempType === "alarma")) {
-                pendingTime = true;
-                appendMessage('syncronix', '¿A qué hora? (ejemplo: 3 PM o 15:00)');
-            } else {
-                // Confirmar la acción
-                if (tempType === "reunion") {
-                    appendMessage('syncronix', `¡Listo! La reunión ha sido agendada para el ${tempDate} a las ${tempTime}.`);
-                } else if (tempType === "alarma") {
-                    appendMessage('syncronix', `¡Perfecto! La alarma ha sido programada para el ${tempDate} a las ${tempTime}.`);
-                }
+            appendMessage('user', userText);
+            userInput.value = '';
+
+            const lowerCaseText = userText.toLowerCase();
+
+            // Pregunta por hora o fecha
+            if (
+                lowerCaseText.includes('que hora es hoy') || lowerCaseText.includes('que hora es') ||
+                lowerCaseText.includes('la hora actual') || lowerCaseText.includes('que fecha es hoy') ||
+                lowerCaseText.includes('que fecha es') || lowerCaseText.includes('la fecha actual') ||
+                lowerCaseText.includes('quiero saber la hora') ||
+                lowerCaseText.includes('me gustaria saber la hora') ||
+                lowerCaseText.includes('dime la hora') ||
+                lowerCaseText.includes('hora actual')
+            ) {
+                const now = new Date();
+                const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+                const timeString = now.toLocaleTimeString('es-VE', timeOptions);
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const dateString = now.toLocaleDateString('es-VE', dateOptions);
+                appendMessage('syncronix', `Son las ${timeString} del ${dateString}.`);
                 resetStates();
             }
-        }
-        // Solicitud de agendar reunión
-        else if (
-            lowerCaseText.includes('agendar reunión') ||
-            lowerCaseText.includes('agendar reunion') ||
-            lowerCaseText.includes('programar reunión') ||
-            lowerCaseText.includes('programar reunion') ||
-            lowerCaseText.includes('crear reunión') ||
-            lowerCaseText.includes('crear reunion')
-        ) {
-            tempType = "reunion";
-            pendingDate = true;
-            appendMessage('syncronix', 'Claro, ¿para qué día quieres agendar la reunión? (ejemplo: 21/07/2025 o 21 de julio de 2025)');
-        }
-        // Solicitud de agendar alarma
-        else if (
-            lowerCaseText.includes('programar alarma') ||
-            lowerCaseText.includes('agendar alarma') ||
-            lowerCaseText.includes('poner alarma') ||
-            lowerCaseText.includes('configurar alarma')
-        ) {
-            tempType = "alarma";
-            pendingDate = true;
-            appendMessage('syncronix', '¡Por supuesto! ¿Para qué día quieres la alarma? (ejemplo: 21/07/2025 o 21 de julio de 2025)');
-        }
-        // Pregunta por el nombre
-        else if (lowerCaseText.includes('como te llamas') || lowerCaseText.includes('cuál es tu nombre')) {
-            appendMessage('syncronix', 'Mi nombre es Syncronix. ¡Un placer conocerte!');
-        }
-        // Pregunta por los creadores
-        else if (
-            lowerCaseText.includes('quien te creo') ||
-            lowerCaseText.includes('quien te hizo') ||
-            lowerCaseText.includes('tus creadores') 
-        ) {
-            appendMessage('syncronix', 'Fui creado por Oscar Jimenez, Isaac Martinez y Miguel Montenegro, estudiantes del Politécnico Santiago Mariño extensión Caracas.');
-        }
-        // Respuesta predeterminada
-        else {
-            appendMessage('syncronix', 'Lo siento, no entendí la pregunta. Puedes reformularla de nuevo o preguntarme otra cosa.');
-        }
-    }
+            // Proceso de agendar reunión o alarma (flujo guiado)
+            else if (pendingDate || pendingTime) {
+                // Extraer fecha y hora si están pendientes
+                let dateMatch = userText.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})|(\d{4}-\d{2}-\d{2})|(\d{1,2} de [a-záéíóú]+( de \d{4})?)/i);
+                let timeMatch = userText.match(/(\d{1,2}(:\d{2})?\s*(am|pm)?)|(a las \d{1,2}(:\d{2})?\s*(am|pm)?)/i);
 
-    function handleKeyPress(event) {
-        if (event.key === 'Enter') {
-            sendMessage();
+                if (pendingDate && dateMatch) {
+                    tempDate = dateMatch[0];
+                    pendingDate = false;
+                }
+                if (pendingTime && timeMatch) {
+                    tempTime = timeMatch[0].replace('a las ', '').trim();
+                    pendingTime = false;
+                }
+
+                // Si falta alguno, preguntar por lo que falta
+                if (!tempDate && (tempType === "reunion" || tempType === "alarma")) {
+                    pendingDate = true;
+                    appendMessage('syncronix', '¿Para qué día? Selecciona una fecha en el calendario:');
+                    showCalendar();
+                } else if (!tempTime && (tempType === "reunion" || tempType === "alarma")) {
+                    pendingTime = true;
+                    appendMessage('syncronix', '¿A qué hora? (ejemplo: 3 PM o 15:00)');
+                } else {
+                    // Confirmar la acción
+                    if (tempType === "reunion") {
+                        appendMessage('syncronix', `¡Listo! La reunión ha sido agendada para el ${tempDate} a las ${tempTime}.`);
+                    } else if (tempType === "alarma") {
+                        appendMessage('syncronix', `¡Perfecto! La alarma ha sido programada para el ${tempDate} a las ${tempTime}.`);
+                    }
+                    resetStates();
+                }
+            }
+            // Solicitud de agendar reunión
+            else if (
+                lowerCaseText.includes('agendar reunión') ||
+                lowerCaseText.includes('agendar reunion') ||
+                lowerCaseText.includes('programar reunión') ||
+                lowerCaseText.includes('programar reunion') ||
+                lowerCaseText.includes('crear reunión') ||
+                lowerCaseText.includes('crear reunion')
+            ) {
+                tempType = "reunion";
+                pendingDate = true;
+                appendMessage('syncronix', 'Claro, ¿para qué día quieres agendar la reunión? (ejemplo: 21/07/2025 o 21 de julio de 2025)');
+            }
+            // Solicitud de agendar alarma
+            else if (
+                lowerCaseText.includes('programar alarma') ||
+                lowerCaseText.includes('agendar alarma') ||
+                lowerCaseText.includes('poner alarma') ||
+                lowerCaseText.includes('configurar alarma')
+            ) {
+                tempType = "alarma";
+                pendingDate = true;
+                appendMessage('syncronix', '¡Por supuesto! ¿Para qué día quieres la alarma? (ejemplo: 21/07/2025 o 21 de julio de 2025)');
+            }
+            // Pregunta por el nombre (si no se ha definido al inicio)
+            else if (lowerCaseText.includes('como te llamas') || lowerCaseText.includes('cuál es tu nombre')) {
+                if (userName) {
+                    appendMessage('syncronix', `Mi nombre es Syncronix. ¡Un placer conocerte, ${userName}!`);
+                } else {
+                    appendMessage('syncronix', 'Mi nombre es Syncronix. ¿Cuál es tu nombre?');
+                    expectingName = true;
+                    userInput.placeholder = "Escribe tu nombre...";
+                    userInput.onkeypress = handleInitialInput;
+                    document.querySelector('.chat-input button').onclick = function() { handleInitialInput({key: 'Enter'}); };
+                }
+            }
+            // Pregunta por los creadores
+            else if (
+                lowerCaseText.includes('quien te creo') ||
+                lowerCaseText.includes('quien te hizo') ||
+                lowerCaseText.includes('tus creadores')
+            ) {
+                appendMessage('syncronix', 'Fui creado por Oscar Jimenez, Isaac Martinez y Miguel Montenegro, estudiantes del Politécnico Santiago Mariño extensión Caracas.');
+            }
+            // Respuesta predeterminada
+            else {
+                appendMessage('syncronix', 'Lo siento, no entendí la pregunta. Puedes reformularla de nuevo o preguntarme otra cosa.');
+            }
         }
-        window.history.pushState({}, '', '/Syncronix.com');
-    }       
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+            window.history.pushState({}, '', '/Syncronix.com');
+        }
+
+        // Llama a esta función al cargar la página para iniciar el flujo
+        window.onload = function() {
+            appendMessage('syncronix', '¡Hola! ¿Cómo te llamas?');
+            userInput.placeholder = "Escribe tu nombre...";
+            userInput.focus();
+            // Ya el onkeypress y el onclick están configurados para handleInitialInput
+        };
     </script>
 </body>
 </html>
