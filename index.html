@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Syncronix - Tu Asistente Virtual</title>
+    <title>SynCronix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Estilos generales del cuerpo */
         body {
             font-family: 'Inter', sans-serif;
-            background: url('fondo.jpg') no-repeat center center fixed;
+            background: url('fondo.jpg') no-repeat center center fixed; /* Asegúrate de que 'fondo.jpg' exista o cámbialo por una URL de placeholder si no lo tienes */
             background-size: cover;
             display: flex;
             justify-content: center;
@@ -17,19 +19,23 @@
             padding: 20px;
             box-sizing: border-box;
         }
+
+        /* Contenedor principal del chat */
         .chat-container {
             background-color: #fff;
-            border-radius: 12px; /* Bordes más redondeados */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada */
-            width: 450px; /* Ancho ligeramente mayor */
-            max-width: 100%; /* Asegurar que sea responsivo */
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            width: 450px;
+            max-width: 100%;
             overflow: hidden;
-            display: flex; /* Usar flexbox para el layout interno */
+            display: flex;
             flex-direction: column;
             height: 600px; /* Altura fija para el contenedor del chat */
-            animation: popIn 0.7s;
+            animation: popIn 0.7s ease-out; /* Animación de entrada */
+            position: relative; /* Necesario para posicionar el modal de ayuda */
         }
 
+        /* Animación para la aparición del chat */
         @keyframes popIn {
             0% {
                 opacity: 0;
@@ -40,111 +46,326 @@
                 transform: scale(1);
             }
         }
+
+        /* Encabezado del chat */
         .chat-header {
-            background-color: #2196F3; /* Azul para el encabezado */
+            background-color: #2196F3; /* Azul vibrante */
             color: white;
             padding: 18px;
             text-align: center;
             font-size: 1.3em;
             font-weight: bold;
-            border-bottom: 1px solid #1976D2; /* Un azul más oscuro para el borde */
-            border-top-left-radius: 12px; /* Bordes redondeados en el header */
+            border-bottom: 1px solid #1976D2; /* Borde más oscuro */
+            border-top-left-radius: 12px;
             border-top-right-radius: 12px;
-            display: flex; /* Para alinear el icono y el texto */
+            display: flex;
             align-items: center;
             justify-content: center;
         }
+
+        /* Estilo para el icono en el encabezado */
         .chat-header img {
-            height: 30px; /* Tamaño del icono */
-            margin-right: 10px; /* Espacio entre el icono y el texto */
-            vertical-align: middle; /* Alineación vertical */
-        }
-        .chat-box {
-            padding: 20px;
-            flex-grow: 1; /* Permite que el chat-box ocupe el espacio restante */
-            overflow-y: auto; /* Scroll para mensajes */
-            display: flex; /* Usar flexbox para los mensajes */
-            flex-direction: column;
-        }
-        .message {
-            animation: fadeInUp 0.5s;
-            margin-bottom: 12px;
-            padding: 10px 15px;
-            border-radius: 8px; /* Bordes más redondeados para mensajes */
-            max-width: 75%; /* Limitar el ancho del mensaje */
-            word-wrap: break-word; /* Romper palabras largas */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra sutil en los mensajes */
+            height: 70px; /* Aumentado de 60px a 70px */
+            width: 70px; /* Añadido para mantener la proporción */
+            margin-right: 25px; /* Ajustado para más espacio */
+            vertical-align: middle;
+            border-radius: 50%; /* Si el logo es cuadrado, lo hace redondo */
         }
 
+        /* Caja de mensajes del chat */
+        .chat-box {
+            padding: 20px;
+            flex-grow: 1; /* Ocupa el espacio restante */
+            overflow-y: auto; /* Permite el scroll si hay muchos mensajes */
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5; /* Fondo claro para el área de mensajes */
+        }
+
+        /* Estilo base para cada mensaje */
+        .message {
+            animation: fadeInUp 0.5s ease-out; /* Animación para cada mensaje */
+            margin-bottom: 12px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            max-width: 75%; /* Limita el ancho del mensaje */
+            word-wrap: break-word; /* Rompe palabras largas */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+        }
+
+        /* Animación para la aparición de mensajes */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
+
+        /* Mensajes del usuario (alineados a la derecha) */
         .user-message {
-            background-color: #e0e0e0; /* Gris para la pregunta del usuario */
-            align-self: flex-end; /* Alinear a la derecha */
-            color: #333; /* Color de texto oscuro para el contraste */
+            background-color: #e0e0e0; /* Gris claro */
+            align-self: flex-end; /* Alinea a la derecha */
+            color: #333;
         }
+
+        /* Mensajes de SynCronix (alineados a la izquierda) */
         .syncronix-message {
-            background-color: #ffffff; /* Blanco para la respuesta de Syncronix */
-            align-self: flex-start; /* Alinear a la izquierda */
-            color: #333; /* Color de texto oscuro para el contraste */
-            border: 1px solid #ddd; /* Borde sutil para mensajes blancos */
+            background-color: #ffffff; /* Blanco */
+            align-self: flex-start; /* Alinea a la izquierda */
+            color: #333;
+            border: 1px solid #ddd; /* Borde sutil */
         }
+
+        /* Área de entrada de texto */
         .chat-input {
             display: flex;
             padding: 15px;
             border-top: 1px solid #eee;
             background-color: #f9f9f9;
-            border-bottom-left-radius: 12px; /* Bordes redondeados en el input */
+            border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
+            align-items: center; /* Centra verticalmente los elementos */
         }
+
+        /* Campo de texto para la entrada del usuario */
         .chat-input input {
-            flex-grow: 1;
+            flex-grow: 1; /* Ocupa el espacio disponible */
             padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 25px; /* Input más redondeado */
+            border-radius: 25px; /* Más redondeado */
             margin-right: 10px;
             font-size: 1em;
-            outline: none; /* Quitar el contorno al enfocar */
+            outline: none; /* Quita el contorno al enfocar */
+            transition: border-color 0.3s ease;
         }
+
+        .chat-input input:focus {
+            border-color: #2196F3; /* Borde azul al enfocar */
+        }
+
+        /* Botón de enviar */
         .chat-input button {
-            background-color: #2196F3; /* Azul para el botón, a juego con el encabezado */
+            background-color: #2196F3; /* Azul a juego con el encabezado */
             color: white;
             border: none;
             padding: 12px 20px;
-            border-radius: 25px; /* Botón más redondeado */
+            border-radius: 25px; /* Más redondeado */
             cursor: pointer;
             font-size: 1em;
             font-weight: bold;
-            transition: background-color 0.3s ease; /* Transición suave al pasar el ratón */
-        }
-        .chat-input button:hover {
-            background-color: #1976D2; /* Un azul más oscuro al pasar el ratón */
-            transform: translateY(-3px) scale(1.05); /* Efecto de elevación al pasar el ratón */
+            transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones suaves */
         }
 
-        /* Responsive adjustments */
+        .chat-input button:hover {
+            background-color: #1976D2; /* Azul más oscuro al pasar el ratón */
+            transform: translateY(-2px); /* Efecto de elevación */
+        }
+
+        /* Botón de ayuda (?) */
+        .help-button {
+            background-color: #607D8B; /* Gris azulado */
+            color: white;
+            border: none;
+            padding: 12px 15px; /* Ajustado para un botón de icono */
+            border-radius: 50%; /* Lo hace circular */
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-left: 10px; /* Espacio a la izquierda del botón de enviar */
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px; /* Ancho y alto para que sea un círculo perfecto */
+            height: 45px;
+            flex-shrink: 0; /* Evita que se encoja */
+        }
+
+        .help-button:hover {
+            background-color: #455A64; /* Gris azulado más oscuro */
+            transform: translateY(-2px);
+        }
+
+        /* Estilos del modal de ayuda */
+        .help-modal {
+            display: none; /* Oculto por defecto */
+            position: fixed; /* Posicionamiento fijo para cubrir toda la pantalla */
+            z-index: 1000; /* Asegura que esté por encima de otros elementos */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Habilita el scroll si el contenido es muy largo */
+            background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente oscuro */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out; /* Animación de aparición */
+        }
+
+        /* Contenido del modal */
+        .help-modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 400px; /* Ancho máximo para el modal */
+            position: relative;
+            animation: slideInTop 0.4s ease-out; /* Animación de entrada del contenido */
+        }
+
+        /* Animaciones para el modal */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInTop {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Botón de cerrar del modal */
+        .close-button {
+            color: #aaa;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .help-modal-content h2 {
+            margin-top: 0;
+            color: #2196F3;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .help-modal-content ul {
+            list-style: none; /* Quita los puntos de la lista */
+            padding: 0;
+            margin: 0;
+        }
+
+        .help-modal-content ul li {
+            background-color: #eef;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            color: #555;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .help-modal-content ul li strong {
+            color: #2196F3; /* Color para las palabras clave */
+        }
+
+        /* Estilo para el indicador de "escribiendo..." */
+        .typing-indicator {
+            align-self: flex-start;
+            margin-bottom: 12px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: #e0e0e0;
+            color: #555;
+            font-style: italic;
+            max-width: 75%;
+            animation: fadeIn 0.3s ease-out;
+            display: none; /* Oculto por defecto */
+        }
+
+        /* Estilos para el modal de notificación/alerta (reemplaza alert()) */
+        .custom-alert-modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            z-index: 1001; /* Mayor que el modal de ayuda */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-alert-content {
+            background-color: #fefefe;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+            position: relative;
+            animation: slideInTop 0.3s ease-out;
+        }
+
+        .custom-alert-content h3 {
+            margin-top: 0;
+            color: #2196F3;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .custom-alert-content p {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .custom-alert-content button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .custom-alert-content button:hover {
+            background-color: #1976D2;
+        }
+
+
+        /* Ajustes responsivos */
         @media (max-width: 600px) {
             .chat-container {
                 width: 100%;
-                height: 95vh; /* Ocupar casi toda la altura en móviles */
-                border-radius: 0; /* Sin bordes redondeados en pantalla completa */
+                height: 95vh;
+                border-radius: 0;
             }
             body {
                 padding: 0;
             }
-            .chat-header {
+            .chat-header, .chat-input {
                 border-radius: 0;
             }
-            .chat-input {
-                border-radius: 0;
+            .help-modal-content, .custom-alert-content {
+                width: 95%; /* Más ancho en móviles */
+                padding: 20px;
             }
         }
     </style>
@@ -152,216 +373,702 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <img src="logo.jpg" alt="Icono de Syncronix" onerror="this.onerror=null;this.src='https://placehold.co/30x30/cccccc/333333?text=Bot';" />
-            Syncronix - Tu Asistente Virtual
+            <!-- Icono de SynCronix. Se usa un placeholder si 'logo.jpg' no se encuentra. -->
+            <img src="logo.jpg" alt="Icono de SynCronix" onerror="this.onerror=null;this.src='https://placehold.co/70x70/cccccc/333333?text=Bot';" />
+            SynCronix
         </div>
         <div class="chat-box" id="chatBox">
-            </div>
-        <div class="chat-input">
-            <input type="text" id="userInput" placeholder="Escribe tu mensaje..." onkeypress="handleInitialInput(event)">
-            <button onclick="handleInitialInput({key: 'Enter'})">Enviar</button>
+            <!-- Los mensajes del chat se añadirán dinámicamente aquí -->
+            <div id="typingIndicator" class="typing-indicator">SynCronix está escribiendo...</div>
         </div>
+        <div class="chat-input">
+            <!-- Campo de entrada de texto para el usuario -->
+            <input type="text" id="userInput" placeholder="Escribe tu mensaje...">
+            <!-- Botón para enviar el mensaje -->
+            <button id="sendButton">Enviar</button>
+            <!-- Nuevo botón de ayuda -->
+            <button id="helpButton" class="help-button">?</button>
+        </div>
+        <!-- Input de tipo fecha oculto para el calendario -->
         <input type="date" id="calendarInput" style="display:none;" />
+
+        <!-- Modal de Ayuda -->
+        <div id="helpModal" class="help-modal" style="display: none;">
+            <div class="help-modal-content">
+                <span class="close-button" id="closeHelpModal">&times;</span>
+                <h2>¿Cómo puedo ayudarte?</h2>
+                <ul id="commandList">
+                    </ul>
+            </div>
+        </div>
+
+        <!-- Modal de Alerta/Notificación Personalizado -->
+        <div id="customAlertModal" class="custom-alert-modal" style="display: none;">
+            <div class="custom-alert-content">
+                <h3 id="customAlertTitle"></h3>
+                <p id="customAlertMessage"></p>
+                <button id="customAlertCloseButton">Entendido</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const chatBox = document.getElementById('chatBox');
-        const userInput = document.getElementById('userInput');
-        const calendarInput = document.getElementById('calendarInput');
+        // --- 1. Declaración de Funciones (Todas las funciones se declaran primero) ---
 
-        let userName = '';
-        let expectingName = true; // Nuevo estado para controlar si esperamos el nombre del usuario
+        // Función para añadir un mensaje al chat
+        function appendMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'syncronix-message');
+            messageDiv.innerHTML = text;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
-        // Cuando Syncronix pida la fecha:
+        // Función para mostrar el indicador de "escribiendo..."
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Función para ocultar el indicador de "escribiendo..."
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        // Función para mostrar un modal de alerta personalizado
+        function showAlert(title, message) {
+            customAlertTitle.textContent = title;
+            customAlertMessage.textContent = message;
+            customAlertModal.style.display = 'flex';
+        }
+
+        // Función para resetear las variables de estado de flujo
+        function resetStates() {
+            currentAction = null;
+            pendingDetail = null;
+            tempEvent = { type: '', date: '', time: '', description: '' };
+            tempTask = { id: null, description: '', completed: false };
+            tempContact = { name: '', phone: '', email: '' };
+            hideTypingIndicator();
+        }
+
+        // Determina el saludo apropiado según la hora del día
+        function getGreetingBasedOnTime() {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 12) {
+                return '¡Buenos días';
+            } else if (hour >= 12 && hour < 19) {
+                return '¡Buenas tardes';
+            } else {
+                return '¡Buenas noches';
+            }
+        }
+
+        // Función para el mensaje de bienvenida inicial
+        function initialGreeting() {
+            appendMessage('syncronix', `${getGreetingBasedOnTime()}! Soy SynCronix, tu asistente personal. ¿Cómo te llamas?`);
+            userInput.placeholder = "Escribe tu nombre...";
+            userInput.focus();
+        }
+
+        // Maneja la consulta de hora y fecha actual
+        function handleTimeAndDateQuery() {
+            const now = new Date();
+            const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const timeString = now.toLocaleTimeString('es-VE', timeOptions);
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('es-VE', dateOptions);
+            appendMessage('syncronix', `Son las ${timeString} del ${dateString}.`);
+            resetStates();
+        }
+
+        // Inicia el flujo para agendar una reunión/alarma/recordatorio
+        function startScheduleEvent(type) {
+            currentAction = type;
+            pendingDetail = 'date';
+            const eventTypeDisplay = type === 'meeting' ? 'reunión' : (type === 'alarm' ? 'alarma' : 'recordatorio');
+            appendMessage('syncronix', `Claro, ¿para qué día quieres ${eventTypeDisplay}? Puedes decirme la fecha (ejemplo: "21/07/2025" o "21 de julio de 2025") o seleccionar en el calendario.`);
+            showCalendar();
+        }
+
+        // Maneja los detalles de fecha, hora y descripción para eventos
+        function handleEventDetails(userText) {
+            if (pendingDetail === 'date') {
+                const date = parseDate(userText);
+                if (date) {
+                    tempEvent.date = date;
+                    pendingDetail = 'time';
+                    appendMessage('syncronix', '¡Fecha registrada! Ahora, ¿a qué hora? (ejemplo: "3 PM" o "15:00") ');
+                    calendarInput.style.display = 'none';
+                } else {
+                    appendMessage('syncronix', 'No pude entender la fecha. Por favor, intenta un formato como "DD/MM/AAAA", "hoy" o "mañana", o selecciona en el calendario.');
+                    showCalendar();
+                }
+            } else if (pendingDetail === 'time') {
+                const time = parseTime(userText);
+                if (time) {
+                    tempEvent.time = time;
+                    pendingDetail = 'description';
+                    appendMessage('syncronix', `Hora registrada. Ahora, ¿cuál es la descripción de este ${currentAction === 'meeting' ? 'reunión' : (currentAction === 'alarm' ? 'alarma' : 'recordatorio')}?`);
+                } else {
+                    appendMessage('syncronix', 'No pude entender la hora. Por favor, intenta un formato como "3 PM", "15:00" o "a las 10:30".');
+                }
+            } else if (pendingDetail === 'description') {
+                tempEvent.description = userText;
+                pendingDetail = null;
+
+                if (currentAction === 'setReminder') {
+                    setBrowserReminder(tempEvent.date, tempEvent.time, tempEvent.description);
+                    appendMessage('syncronix', `¡Recordatorio programado para el "${tempEvent.date}" a las "${tempEvent.time}": "${tempEvent.description}". Te notificaré en el navegador.`);
+                } else {
+                    scheduledEvents.push({
+                        id: Date.now(),
+                        type: currentAction,
+                        date: tempEvent.date,
+                        time: tempEvent.time,
+                        description: tempEvent.description
+                    });
+                    saveAllData();
+                    const eventTypeDisplay = currentAction === 'meeting' ? 'reunión' : 'alarma';
+                    appendMessage('syncronix', `¡Listo, ${userName}! Tu "${eventTypeDisplay}" ha sido agendada para el "${tempEvent.date}" a las "${tempEvent.time}": "${tempEvent.description}". ¿Hay algo más en lo que pueda ayudarte hoy?`);
+                }
+                resetStates();
+            }
+        }
+
+        // Establece un recordatorio que aparecerá como una alerta en el navegador
+        function setBrowserReminder(dateStr, timeStr, description) {
+            const [day, month, year] = dateStr.split('/').map(Number);
+            const [hour, minute] = timeStr.split(':').map(Number);
+
+            const reminderDate = new Date(year, month - 1, day, hour, minute, 0);
+            const now = new Date();
+
+            if (reminderDate <= now) {
+                showAlert('Error de Recordatorio', 'La fecha y hora del recordatorio deben ser en el futuro.');
+                return;
+            }
+
+            const timeToReminder = reminderDate.getTime() - now.getTime();
+
+            setTimeout(() => {
+                showAlert('Recordatorio SynCronix', `¡Es hora de: ${description}! (${dateStr} a las ${timeStr})`);
+            }, timeToReminder);
+        }
+
+        // Inicia el flujo para añadir una tarea
+        function startAddTask() {
+            currentAction = 'addTask';
+            pendingDetail = 'description';
+            appendMessage('syncronix', '¿Cuál es la descripción de la tarea que quieres añadir?');
+        }
+
+        // Maneja la descripción de la tarea
+        function handleAddTaskDescription(userText) {
+            tempTask.description = userText;
+            tempTask.id = Date.now();
+            tasks.push(tempTask);
+            saveAllData();
+            appendMessage('syncronix', `¡Tarea "${tempTask.description}" añadida a tu lista!`);
+            resetStates();
+        }
+
+        // Lista todas las tareas
+        function listTasks() {
+            if (tasks.length === 0) {
+                appendMessage('syncronix', 'No tienes tareas pendientes.');
+                return;
+            }
+            let response = 'Aquí está tu lista de tareas:\n';
+            tasks.forEach((task, index) => {
+                const status = task.completed ? '✅' : '⏳';
+                response += `\n${index + 1}. ${status} ${task.description}`;
+            });
+            appendMessage('syncronix', response);
+            resetStates();
+        }
+
+        // Inicia el flujo para marcar una tarea como completada
+        function startCompleteTask() {
+            currentAction = 'completeTask';
+            pendingDetail = 'taskId';
+            listTasks();
+            appendMessage('syncronix', '¿Qué número de tarea quieres marcar como completada?');
+        }
+
+        // Maneja la marcación de tarea como completada
+        function handleCompleteTask(userText) {
+            const taskNumber = parseInt(userText);
+            if (isNaN(taskNumber) || taskNumber <= 0 || taskNumber > tasks.length) {
+                appendMessage('syncronix', 'Por favor, introduce un número de tarea válido.');
+                return;
+            }
+            tasks[taskNumber - 1].completed = true;
+            saveAllData();
+            appendMessage('syncronix', `¡Tarea "${tasks[taskNumber - 1].description}" marcada como completada!`);
+            resetStates();
+        }
+
+        // Inicia el flujo para eliminar una tarea
+        function startDeleteTask() {
+            currentAction = 'deleteTask';
+            pendingDetail = 'taskId';
+            listTasks();
+            appendMessage('syncronix', '¿Qué número de tarea quieres eliminar?');
+        }
+
+        // Maneja la eliminación de una tarea
+        function handleDeleteTask(userText) {
+            const taskNumber = parseInt(userText);
+            if (isNaN(taskNumber) || taskNumber <= 0 || taskNumber > tasks.length) {
+                appendMessage('syncronix', 'Por favor, introduce un número de tarea válido.');
+                return;
+            }
+            const deletedTask = tasks.splice(taskNumber - 1, 1);
+            saveAllData();
+            appendMessage('syncronix', `¡Tarea "${deletedTask[0].description}" eliminada!`);
+            resetStates();
+        }
+
+        // Inicia el flujo para cancelar un evento
+        function startCancelEvent() {
+            currentAction = 'cancelEvent';
+            pendingDetail = 'eventId';
+            if (scheduledEvents.length === 0) {
+                appendMessage('syncronix', 'No tienes reuniones o alarmas agendadas para cancelar.');
+                resetStates();
+                return;
+            }
+            let response = 'Aquí están tus eventos agendados:\n';
+            scheduledEvents.forEach((event, index) => {
+                const eventTypeDisplay = event.type === 'meeting' ? 'Reunión' : 'Alarma';
+                response += `\n${index + 1}. "${eventTypeDisplay}" el ${event.date} a las "${event.time}": "${event.description}"`;
+            });
+            appendMessage('syncronix', response);
+            appendMessage('syncronix', '¿Qué número de evento quieres cancelar?');
+        }
+
+        // Maneja la cancelación de un evento
+        function handleCancelEvent(userText) {
+            const eventNumber = parseInt(userText);
+            if (isNaN(eventNumber) || eventNumber <= 0 || eventNumber > scheduledEvents.length) {
+                appendMessage('syncronix', 'Por favor, introduce un número de evento válido.');
+                return;
+            }
+            const canceledEvent = scheduledEvents.splice(eventNumber - 1, 1);
+            saveAllData();
+            const eventTypeDisplay = canceledEvent[0].type === 'meeting' ? 'reunión' : 'alarma';
+            appendMessage('syncronix', `¡Tu ${eventTypeDisplay} "${canceledEvent[0].description}" ha sido cancelada!`);
+            resetStates();
+        }
+
+        // Inicia el flujo para añadir un contacto
+        function startAddContact() {
+            currentAction = 'addContact';
+            pendingDetail = 'contactName';
+            appendMessage('syncronix', 'Para añadir un contacto, ¿cuál es su nombre?');
+        }
+
+        // Maneja los detalles para añadir un contacto
+        function handleAddContactDetails(userText) {
+            if (pendingDetail === 'contactName') {
+                tempContact.name = userText;
+                pendingDetail = 'contactPhone';
+                appendMessage('syncronix', `Ok, ¿cuál es el número de teléfono de ${tempContact.name}?`);
+            } else if (pendingDetail === 'contactPhone') {
+                tempContact.phone = userText;
+                pendingDetail = 'contactEmail';
+                appendMessage('syncronix', `Y, ¿cuál es su dirección de correo electrónico? (Puedes decir "no" si no tiene)`);
+            } else if (pendingDetail === 'contactEmail') {
+                tempContact.email = userText.toLowerCase() === 'no' ? '' : userText;
+                contacts.push(tempContact);
+                saveAllData();
+                appendMessage('syncronix', `¡Contacto ${tempContact.name} añadido! Teléfono: ${tempContact.phone}, Email: ${tempContact.email || 'N/A'}.`);
+                resetStates();
+            }
+        }
+
+        // Lista todos los contactos
+        function listContacts() {
+            if (contacts.length === 0) {
+                appendMessage('syncronix', 'No tienes contactos guardados.');
+                return;
+            }
+            let response = 'Aquí están tus contactos:\n';
+            contacts.forEach((contact, index) => {
+                response += `\n${index + 1}. "${contact.name}" - Tel: ${contact.phone} - Email: ${contact.email || 'N/A'}`;
+            });
+            appendMessage('syncronix', response);
+            resetStates();
+        }
+
+        // Inicia el flujo para buscar un contacto
+        function startFindContact() {
+            currentAction = 'findContact';
+            pendingDetail = 'contactName';
+            appendMessage('syncronix', '¿Qué contacto quieres buscar? Por favor, dime su nombre.');
+        }
+
+        // Maneja la búsqueda de un contacto
+        function handleFindContact(userText) {
+            const searchTerm = userText.toLowerCase();
+            const foundContact = contacts.find(contact => contact.name.toLowerCase().includes(searchTerm));
+
+            if (foundContact) {
+                appendMessage('syncronix', `Encontré a "${foundContact.name}": Teléfono: ${foundContact.phone}, Email: ${foundContact.email || 'N/A'}.`);
+            } else {
+                appendMessage('syncronix', `Lo siento, no encontré ningún contacto con el nombre "${userText}".`);
+            }
+            resetStates();
+        }
+
+        // Responde a la pregunta sobre los creadores del bot
+        function handleCreatorsQuery() {
+            appendMessage('syncronix', 'Fui creado por Oscar Jimenez, Isaac Martinez y Miguel Montenegro, estudiantes del Politécnico Santiago Mariño extensión Caracas.');
+            resetStates();
+        }
+
+        // Responde al saludo inicial o pregunta por el nombre
+        function handleNameQuery() {
+            if (userName) {
+                appendMessage('syncronix', `Mi nombre es SynCronix. ¡Un placer conocerte, ${userName}!`);
+            } else {
+                appendMessage('syncronix', 'Mi nombre es SynCronix. ¿Cuál es tu nombre?');
+                expectingName = true;
+                userInput.placeholder = "Escribe tu nombre...";
+            }
+            resetStates();
+        }
+
+        // Maneja saludos generales como "hola", "buenos días", etc.
+        function handleGreeting() {
+            if (userName) {
+                appendMessage('syncronix', `${getGreetingBasedOnTime()}, ${userName}! ¿En qué puedo ayudarte hoy?`);
+            } else {
+                appendMessage('syncronix', `${getGreetingBasedOnTime()}! ¿Cómo te llamas?`);
+                expectingName = true;
+                userInput.placeholder = "Escribe tu nombre...";
+            }
+            resetStates();
+        }
+
+        // Parsea y formatea una fecha a partir de un texto
+        function parseDate(text) {
+            let dateMatch = text.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})|(\d{4}-\d{2}-\d{2})/);
+            if (dateMatch) {
+                const parts = dateMatch[0].includes('/') ? dateMatch[0].split('/') : dateMatch[0].split('-');
+                let day = parts[0];
+                let month = parts[1];
+                let year = parts[2];
+                if (dateMatch[0].includes('-')) {
+                    [year, month, day] = parts;
+                }
+                return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+            }
+            const monthNames = {
+                "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
+                "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
+            };
+            const naturalDateMatch = text.match(/(\d{1,2}) de ([a-záéíóú]+)( de (\d{4}))?/i);
+            if (naturalDateMatch) {
+                let day = naturalDateMatch[1];
+                let month = monthNames[naturalDateMatch[2].toLowerCase()];
+                let year = naturalDateMatch[4] || new Date().getFullYear().toString();
+                if (day.length === 1) day = '0' + day;
+                return `${day}/${month}/${year}`;
+            }
+
+            const today = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+
+            if (text.includes('hoy')) {
+                return today.toLocaleDateString('es-VE');
+            } else if (text.includes('mañana')) {
+                return tomorrow.toLocaleDateString('es-VE');
+            }
+            return null;
+        }
+
+        // Parsea y formatea una hora a partir de un texto
+        function parseTime(text) {
+            const timeRegex = /(\d{1,2}(:\d{2})?\s*(am|pm)?)|(a las \d{1,2}(:\d{2})?\s*(am|pm)?)/i;
+            let match = text.match(timeRegex);
+            if (match) {
+                let timeStr = match[0].replace('a las ', '').trim();
+                let [hour, minute] = timeStr.split(':');
+                let ampm = '';
+
+                if (minute) {
+                    minute = minute.match(/\d{2}/) ? minute.match(/\d{2}/)[0] : '00';
+                    ampm = timeStr.match(/(am|pm)/i);
+                } else {
+                    minute = '00';
+                    ampm = timeStr.match(/(am|pm)/i);
+                    hour = timeStr.match(/\d{1,2}/)[0];
+                }
+
+                if (ampm && ampm[0].toLowerCase() === 'pm' && parseInt(hour) < 12) {
+                    hour = parseInt(hour) + 12;
+                } else if (ampm && ampm[0].toLowerCase() === 'am' && parseInt(hour) === 12) {
+                    hour = 0;
+                }
+
+                return `${String(hour).padStart(2, '0')}:${minute}`;
+            }
+            return null;
+        }
+
+        // Muestra el input de calendario para la selección de fecha
         function showCalendar() {
             calendarInput.style.display = 'block';
             calendarInput.focus();
             calendarInput.value = '';
             calendarInput.onchange = function() {
                 if (calendarInput.value) {
-                    tempDate = calendarInput.value.split('-').reverse().join('/');
-                    appendMessage('user', tempDate);
+                    const selectedDate = new Date(calendarInput.value + 'T00:00:00');
+                    tempEvent.date = selectedDate.toLocaleDateString('es-VE');
+                    appendMessage('user', tempEvent.date);
                     calendarInput.style.display = 'none';
-                    pendingDate = false;
-                    if (!tempTime) {
-                        pendingTime = true;
-                        appendMessage('syncronix', '¿A qué hora? (ejemplo: 3 PM o 15:00)');
-                    }
+                    pendingDetail = 'time';
+                    appendMessage('syncronix', 'Perfecto, ¿a qué hora? (ejemplo: "3 PM" o "15:00") ');
                 }
             };
         }
 
-        function appendMessage(sender, text) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'syncronix-message');
-            messageDiv.textContent = text;
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+        // Llama a la API de Gemini para respuestas generales
+        async function callGeminiAPI(prompt) {
+            showTypingIndicator();
+            const chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            // IMPORTANTE: Si estás ejecutando este archivo HTML directamente en tu navegador (no en un entorno como Canvas que inyecta la clave),
+            // DEBES obtener una clave API de Google AI Studio (https://aistudio.google.com/app/apikey) y pegarla aquí:
+            const apiKey = "AIzaSyBI0QxOjdc2-xZmMHE0D1W8Po2Mvg1Sf_8"; // <--- PEGA TU CLAVE API DE GEMINI AQUÍ SI NO ESTÁS EN UN ENTORNO CANVAS
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-        function resetStates() {
-            schedulingMeeting = false;
-            schedulingAlarm = false;
-            pendingDate = false;
-            pendingTime = false;
-            tempType = "";
-            tempDate = "";
-            tempTime = "";
-        }
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
 
-        // Variables de estado
-        let schedulingMeeting = false;
-        let schedulingAlarm = false;
-        let pendingDate = false;
-        let pendingTime = false;
-        let tempType = ""; // "reunion" o "alarma"
-        let tempDate = "";
-        let tempTime = "";
-
-        // Nueva función para manejar el input inicial (el nombre)
-        function handleInitialInput(event) {
-            if (event.key === 'Enter' || event.type === 'click') { // Agrega event.type === 'click' para el botón
-                const name = userInput.value.trim();
-                if (name && expectingName) {
-                    userName = name;
-                    appendMessage('user', userName);
-                    appendMessage('syncronix', `¡Bienvenido, ${userName}! ¿En qué puedo ayudarte hoy?`);
-                    userInput.value = '';
-                    userInput.placeholder = "Escribe tu mensaje...";
-                    expectingName = false; // Ya no esperamos el nombre
-                    userInput.onkeypress = handleKeyPress; // Reasignar a la función de manejo normal
-                    document.querySelector('.chat-input button').onclick = sendMessage; // Reasignar el clic del botón
-                    userInput.focus();
-                } else if (!expectingName) {
-                    sendMessage(); // Si ya no esperamos el nombre, procede con la lógica normal
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    appendMessage('syncronix', text);
+                } else {
+                    // Mensaje más específico para el usuario si la API no devuelve contenido
+                    appendMessage('syncronix', 'Lo siento, no pude generar una respuesta en este momento. Esto podría ser un problema con la conexión a la IA o que no tengo una clave API configurada. Por favor, intenta de nuevo más tarde.');
                 }
-            }
-        }
-
-        function sendMessage() {
-            const userText = userInput.value.trim();
-            if (userText === '') return;
-
-            appendMessage('user', userText);
-            userInput.value = '';
-
-            const lowerCaseText = userText.toLowerCase();
-
-            // Pregunta por hora o fecha
-            if (
-                lowerCaseText.includes('que hora es hoy') || lowerCaseText.includes('que hora es') ||
-                lowerCaseText.includes('la hora actual') || lowerCaseText.includes('que fecha es hoy') ||
-                lowerCaseText.includes('que fecha es') || lowerCaseText.includes('la fecha actual') ||
-                lowerCaseText.includes('quiero saber la hora') ||
-                lowerCaseText.includes('me gustaria saber la hora') ||
-                lowerCaseText.includes('dime la hora') ||
-                lowerCaseText.includes('hora actual')
-            ) {
-                const now = new Date();
-                const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-                const timeString = now.toLocaleTimeString('es-VE', timeOptions);
-                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                const dateString = now.toLocaleDateString('es-VE', dateOptions);
-                appendMessage('syncronix', `Son las ${timeString} del ${dateString}.`);
+            } catch (error) {
+                console.error('Error al llamar a la API de Gemini:', error);
+                appendMessage('syncronix', 'Hubo un problema al conectar con mi cerebro (la inteligencia artificial). Asegúrate de que tienes una conexión a internet y, si estás ejecutando esto localmente, que has configurado tu clave API de Gemini.');
+            } finally {
+                hideTypingIndicator();
                 resetStates();
             }
-            // Proceso de agendar reunión o alarma (flujo guiado)
-            else if (pendingDate || pendingTime) {
-                // Extraer fecha y hora si están pendientes
-                let dateMatch = userText.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})|(\d{4}-\d{2}-\d{2})|(\d{1,2} de [a-záéíóú]+( de \d{4})?)/i);
-                let timeMatch = userText.match(/(\d{1,2}(:\d{2})?\s*(am|pm)?)|(a las \d{1,2}(:\d{2})?\s*(am|pm)?)/i);
+        }
 
-                if (pendingDate && dateMatch) {
-                    tempDate = dateMatch[0];
-                    pendingDate = false;
-                }
-                if (pendingTime && timeMatch) {
-                    tempTime = timeMatch[0].replace('a las ', '').trim();
-                    pendingTime = false;
-                }
+        // --- 2. Referencias a los elementos del DOM ---
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const calendarInput = document.getElementById('calendarInput');
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const closeHelpModal = document.getElementById('closeHelpModal');
+        const commandList = document.getElementById('commandList');
+        const typingIndicator = document.getElementById('typingIndicator');
 
-                // Si falta alguno, preguntar por lo que falta
-                if (!tempDate && (tempType === "reunion" || tempType === "alarma")) {
-                    pendingDate = true;
-                    appendMessage('syncronix', '¿Para qué día? Selecciona una fecha en el calendario:');
-                    showCalendar();
-                } else if (!tempTime && (tempType === "reunion" || tempType === "alarma")) {
-                    pendingTime = true;
-                    appendMessage('syncronix', '¿A qué hora? (ejemplo: 3 PM o 15:00)');
-                } else {
-                    // Confirmar la acción
-                    if (tempType === "reunion") {
-                        appendMessage('syncronix', `¡Listo! La reunión ha sido agendada para el ${tempDate} a las ${tempTime}.`);
-                    } else if (tempType === "alarma") {
-                        appendMessage('syncronix', `¡Perfecto! La alarma ha sido programada para el ${tempDate} a las ${tempTime}.`);
+        const customAlertModal = document.getElementById('customAlertModal');
+        const customAlertTitle = document.getElementById('customAlertTitle');
+        const customAlertMessage = document.getElementById('customAlertMessage');
+        const customAlertCloseButton = document.getElementById('customAlertCloseButton');
+
+        // --- 3. Variables de estado del chatbot ---
+        let userName = '';
+        let expectingName = true;
+
+        let currentAction = null;
+        let pendingDetail = null;
+        let tempEvent = { type: '', date: '', time: '', description: '' };
+        let tempTask = { id: null, description: '', completed: false };
+        let tempContact = { name: '', phone: '', email: '' };
+
+        // Almacenamiento de datos en localStorage
+        let scheduledEvents = JSON.parse(localStorage.getItem('syncronixEvents')) || [];
+        let tasks = JSON.parse(localStorage.getItem('syncronixTasks')) || [];
+        let contacts = JSON.parse(localStorage.getItem('syncronixContacts')) || [];
+
+        // --- 4. Función para guardar todos los datos en localStorage ---
+        function saveAllData() {
+            localStorage.setItem('syncronixEvents', JSON.stringify(scheduledEvents));
+            localStorage.setItem('syncronixTasks', JSON.stringify(tasks));
+            localStorage.setItem('syncronixContacts', JSON.stringify(contacts));
+        }
+
+        // --- 5. Mapeo de comandos a funciones (DEFINIDO EN window.onload) ---
+        let commandMap; // Se declara aquí, pero se inicializa en window.onload
+
+        // --- 6. Función principal para procesar el mensaje del usuario ---
+        async function processMessage(userText) {
+            const lowerCaseText = userText.toLowerCase();
+
+            if (expectingName) {
+                userName = userText.split(' ')[0];
+                appendMessage('user', userText);
+                appendMessage('syncronix', `¡Excelente, ${userName}! Me alegra tenerte aquí. Soy un asistente personal y puedo ayudarte con muchas cosas. ¿Qué te gustaría hacer?`);
+                expectingName = false;
+                userInput.placeholder = "Escribe tu mensaje...";
+                resetStates();
+                return;
+            }
+
+            appendMessage('user', userText);
+
+            if (currentAction && pendingDetail) {
+                // Llama a la función de manejo de detalles según la acción actual
+                switch (currentAction) {
+                    case 'meeting':
+                    case 'alarm':
+                    case 'setReminder':
+                        handleEventDetails(userText);
+                        break;
+                    case 'addTask':
+                        handleAddTaskDescription(userText);
+                        break;
+                    case 'completeTask':
+                        handleCompleteTask(userText);
+                        break;
+                    case 'deleteTask':
+                        handleDeleteTask(userText);
+                        break;
+                    case 'cancelEvent':
+                        handleCancelEvent(userText);
+                        break;
+                    case 'addContact':
+                        handleAddContactDetails(userText);
+                        break;
+                    case 'findContact':
+                        handleFindContact(userText);
+                        break;
+                    default:
+                        appendMessage('syncronix', 'Hubo un error en el flujo actual. Por favor, intenta de nuevo.');
+                        resetStates();
+                        break;
+                }
+                return; // Salir de la función si se está en un flujo guiado
+            }
+
+            // Procesar comandos directos si no hay flujo pendiente
+            for (const command of commandMap) {
+                for (const keyword of command.keywords) {
+                    if (lowerCaseText.includes(keyword)) {
+                        // Aquí es donde se llama la función por su nombre de cadena
+                        const handlerFunction = window[command.handlerName];
+                        if (typeof handlerFunction === 'function') {
+                            if (command.args) {
+                                handlerFunction(...command.args); // Pasa argumentos si están definidos
+                            } else {
+                                handlerFunction();
+                            }
+                        } else {
+                            console.error(`Error: La función manejadora '${command.handlerName}' no está definida.`);
+                            appendMessage('syncronix', 'Lo siento, hubo un problema interno. Por favor, intenta de nuevo.');
+                        }
+                        return; // Salir después de manejar un comando
                     }
-                    resetStates();
                 }
             }
-            // Solicitud de agendar reunión
-            else if (
-                lowerCaseText.includes('agendar reunión') ||
-                lowerCaseText.includes('agendar reunion') ||
-                lowerCaseText.includes('programar reunión') ||
-                lowerCaseText.includes('programar reunion') ||
-                lowerCaseText.includes('crear reunión') ||
-                lowerCaseText.includes('crear reunion')
-            ) {
-                tempType = "reunion";
-                pendingDate = true;
-                appendMessage('syncronix', 'Claro, ¿para qué día quieres agendar la reunión? (ejemplo: 21/07/2025 o 21 de julio de 2025)');
-            }
-            // Solicitud de agendar alarma
-            else if (
-                lowerCaseText.includes('programar alarma') ||
-                lowerCaseText.includes('agendar alarma') ||
-                lowerCaseText.includes('poner alarma') ||
-                lowerCaseText.includes('configurar alarma')
-            ) {
-                tempType = "alarma";
-                pendingDate = true;
-                appendMessage('syncronix', '¡Por supuesto! ¿Para qué día quieres la alarma? (ejemplo: 21/07/2025 o 21 de julio de 2025)');
-            }
-            // Pregunta por el nombre (si no se ha definido al inicio)
-            else if (lowerCaseText.includes('como te llamas') || lowerCaseText.includes('cuál es tu nombre')) {
-                if (userName) {
-                    appendMessage('syncronix', `Mi nombre es Syncronix. ¡Un placer conocerte, ${userName}!`);
-                } else {
-                    appendMessage('syncronix', 'Mi nombre es Syncronix. ¿Cuál es tu nombre?');
-                    expectingName = true;
-                    userInput.placeholder = "Escribe tu nombre...";
-                    userInput.onkeypress = handleInitialInput;
-                    document.querySelector('.chat-input button').onclick = function() { handleInitialInput({key: 'Enter'}); };
-                }
-            }
-            // Pregunta por los creadores
-            else if (
-                lowerCaseText.includes('quien te creo') ||
-                lowerCaseText.includes('quien te hizo') ||
-                lowerCaseText.includes('tus creadores')
-            ) {
-                appendMessage('syncronix', 'Fui creado por Oscar Jimenez, Isaac Martinez y Miguel Montenegro, estudiantes del Politécnico Santiago Mariño extensión Caracas.');
-            }
-            // Respuesta predeterminada
-            else {
-                appendMessage('syncronix', 'Lo siento, no entendí la pregunta. Puedes reformularla de nuevo o preguntarme otra cosa.');
+
+            // Si no se entendió ningún comando específico, llamar al LLM
+            await callGeminiAPI(userText);
+        }
+
+        // --- 7. Manejo de Eventos de la Interfaz de Usuario (UI) ---
+
+        function handleUserInput() {
+            const text = userInput.value.trim();
+            if (text) {
+                processMessage(text);
+                userInput.value = '';
             }
         }
 
-        function handleKeyPress(event) {
+        userInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-                sendMessage();
+                handleUserInput();
             }
-            window.history.pushState({}, '', '/Syncronix.com');
+        });
+
+        sendButton.addEventListener('click', handleUserInput);
+
+        // --- Lógica del Modal de Ayuda ---
+
+        function populateCommandList() {
+            commandList.innerHTML = '';
+            const nameHelp = document.createElement('li');
+            nameHelp.innerHTML = `Saber mi nombre: Escribe "<strong>cómo te llamas</strong>"`;
+            commandList.appendChild(nameHelp);
+
+            commandMap.forEach(command => {
+                if (command.displayName) {
+                    const listItem = document.createElement('li');
+                    // Asegura que las palabras clave en el modal de ayuda sean azules
+                    listItem.innerHTML = `${command.displayName}: Escribe "<strong>${command.keywords[0]}</strong>"`;
+                    commandList.appendChild(listItem);
+                }
+            });
         }
 
-        // Llama a esta función al cargar la página para iniciar el flujo
+        helpButton.addEventListener('click', () => {
+            populateCommandList();
+            helpModal.style.display = 'flex';
+        });
+
+        closeHelpModal.addEventListener('click', () => {
+            helpModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === helpModal) {
+                helpModal.style.display = 'none';
+            }
+        });
+
+        // --- Lógica del Modal de Alerta Personalizado ---
+        customAlertCloseButton.addEventListener('click', () => {
+            customAlertModal.style.display = 'none';
+        });
+
+        // --- 8. Inicialización al cargar la página ---
         window.onload = function() {
-            appendMessage('syncronix', '¡Hola! ¿Cómo te llamas?');
-            userInput.placeholder = "Escribe tu nombre...";
-            userInput.focus();
-            // Ya el onkeypress y el onclick están configurados para handleInitialInput
+            // Inicializar commandMap aquí, asegurando que todas las funciones estén definidas
+            commandMap = [
+                { keywords: ['que hora es', 'que fecha es', 'la hora actual', 'la fecha actual', 'quiero saber la hora'], handlerName: 'handleTimeAndDateQuery', displayName: "Preguntar la hora y fecha actual" },
+                { keywords: ['agendar reunion', 'programar reunion', 'crear reunion'], handlerName: 'startScheduleEvent', args: ['meeting'], displayName: "Agendar una reunión" },
+                { keywords: ['programar alarma', 'agendar alarma', 'poner alarma', 'configurar alarma'], handlerName: 'startScheduleEvent', args: ['alarm'], displayName: "Programar una alarma" },
+                { keywords: ['recordatorio', 'pon un recordatorio', 'recuerdame'], handlerName: 'startScheduleEvent', args: ['setReminder'], displayName: "Establecer un recordatorio" },
+                { keywords: ['quien te creo', 'quien te hizo', 'tus creadores'], handlerName: 'handleCreatorsQuery', displayName: "Saber quién me creó" },
+                { keywords: ['como te llamas', 'cual es tu nombre'], handlerName: 'handleNameQuery', displayName: "Saber mi nombre" },
+                { keywords: ['lista eventos', 'muestrame mis eventos', 'que tengo agendado'], handlerName: 'listScheduledEvents', displayName: "Ver mis reuniones y alarmas" },
+                { keywords: ['hola', 'buenos dias', 'buenas tardes', 'buenas noches', 'saludos'], handlerName: 'handleGreeting', displayName: "Saludar al bot" },
+                { keywords: ['añadir tarea', 'nueva tarea', 'agregar tarea'], handlerName: 'startAddTask', displayName: "Añadir una tarea" },
+                { keywords: ['lista tareas', 'mis tareas', 'ver tareas'], handlerName: 'listTasks', displayName: "Ver mi lista de tareas" },
+                { keywords: ['completar tarea', 'tarea completada'], handlerName: 'startCompleteTask', displayName: "Marcar tarea como completada" },
+                { keywords: ['eliminar tarea', 'borrar tarea'], handlerName: 'startDeleteTask', displayName: "Eliminar una tarea" },
+                { keywords: ['cancelar evento', 'cancelar reunion', 'cancelar alarma'], handlerName: 'startCancelEvent', displayName: "Cancelar un evento agendado" },
+                { keywords: ['añadir contacto', 'nuevo contacto', 'agregar contacto'], handlerName: 'startAddContact', displayName: "Añadir un contacto" },
+                { keywords: ['lista contactos', 'mis contactos', 'ver contactos'], handlerName: 'listContacts', displayName: "Ver mi lista de contactos" },
+                { keywords: ['buscar contacto', 'encontrar contacto'], handlerName: 'startFindContact', displayName: "Buscar un contacto" }
+            ];
+
+            initialGreeting(); // Iniciar el saludo y el chat
         };
     </script>
 </body>
