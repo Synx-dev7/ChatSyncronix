@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SynCronix Soporte Técnico</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Degradado animado para el fondo del body */
+            background: linear-gradient(45deg, #3e51ff, #000000, #00e1ff);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            overflow: hidden; /* Importante para el efecto de fondo y evitar desbordamientos */
+        }
+
+        /* Animación del degradado del body */
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Contenedor del chat */
+        .chat-container {
+            width: 90%;
+            max-width: 500px;
+            /* Mejoras para el cajón del chatbot */
+            max-height: 80vh; /* Altura máxima para adaptabilidad en móviles */
+            min-height: 500px; /* Altura mínima para asegurar visibilidad */
+            background-color: rgb(255, 255, 255);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Encabezado del chat */
+        .chat-header {
+            /* Degradado animado para el header */
+            background: linear-gradient(270deg, #3e51ff, #000000, #00e1ff);
+            background-size: 200% 200%;
+            animation: gradientAnimation 5s ease infinite; /* Animación del gradiente */
+            padding: 10px 20px;
+            display: flex; /* Usa flexbox para alinear contenido */
+            align-items: center; /* Centra verticalmente */
+            justify-content: space-between; /* Distribuye espacio */
+            color: white; /* Asegura que el texto sea blanco */
+            border-top-left-radius: 15px; /* Bordes redondeados */
+            border-top-right-radius: 15px;
+        }
+
+        /* Animación del degradado del header */
+        @keyframes gradientAnimation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            flex-grow: 1; /* Permite que el título ocupe el espacio */
+            text-align: center; /* Centra el título */
+        }
+
+        .logo {
+            width: auto;
+            height: 40px;
+            margin-right: 10px;
+            object-fit: contain;
+        }
+
+        .help-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .help-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Área de mensajes */
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #ffffff;
+            display: flex; /* Para que el typing-indicator se posicione bien */
+            flex-direction: column; /* Apila los mensajes */
+            /* Mejoras para el cajón del chatbot */
+            will-change: transform; /* Optimización de rendimiento para animaciones o cambios de propiedad */
+            scroll-behavior: smooth; /* Desplazamiento suave al hacer scroll programáticamente */
+        }
+
+        /* Mensajes individuales */
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+            /* Efectos de transición para los mensajes */
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .message:hover {
+            transform: translateY(-2px); /* Ligeramente hacia arriba al pasar el ratón */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Sombra sutil al pasar el ratón */
+        }
+
+        .user-message {
+            background-color: #4a6bff;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .syncronix-message {
+            background-color: #e5e7eb;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+
+        .tech-message {
+            background-color: #d1fae5;
+            color: #065f46;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            border-left: 3px solid #10b981;
+        }
+
+        /* Indicador de "escribiendo..." */
+        .typing-indicator {
+            color: #666;
+            font-style: italic;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            min-height: 20px; /* Asegura que el elemento tenga altura */
+        }
+
+        /* Animación de los puntos del indicador de "escribiendo" */
+        .typing-indicator::after {
+            content: '...'; /* Contenido inicial */
+            display: inline-block;
+            animation: typingDots 1.5s infinite; /* Aplica la animación */
+        }
+
+        @keyframes typingDots {
+            0% { content: '.'; }   /* Un punto */
+            33% { content: '..'; }  /* Dos puntos */
+            66% { content: '...'; } /* Tres puntos */
+        }
+
+        /* Área de entrada */
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .chat-input input:focus {
+            border-color: #4a6bff;
+        }
+
+        .chat-input button {
+            background-color: #4a6bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .chat-input button:hover {
+            background-color: #3a5bef;
+        }
+
+        #calendarInput {
+            display: none;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        /* Modales */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close-button:hover {
+            color: #333;
+        }
+
+        /* Estilos específicos para el modal de ayuda */
+        #helpModal h2 {
+            color: #4a6bff;
+            margin-top: 0;
+        }
+
+        #helpModal p {
+            margin-bottom: 10px;
+        }
+
+        #commandList {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        #commandList li {
+            margin-bottom: 8px;
+        }
+
+        /* Estilos para el modal de alerta personalizado */
+        .alert-modal-content {
+            text-align: center;
+        }
+
+        .alert-modal-content h2 {
+            color: #4a6bff;
+            margin-top: 0;
+        }
+
+        /* Barra de desplazamiento personalizada */
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <img src="logo.jpg" alt="SynCronix Logo" class="logo">
+            <h1>SynCronix Soporte Técnico</h1>
+            <button id="helpButton" class="help-button">?</button>
+        </div>
+        <div class="chat-box" id="chatBox">
+            <div id="typingIndicator" class="typing-indicator" style="display: none;"></div>
+        </div>
+        <div class="chat-input">
+            <input type="date" id="calendarInput" style="display: none;">
+            <input type="text" id="userInput" placeholder="Escribe tu mensaje...">
+            <button id="sendButton">Enviar</button>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeHelpModal">&times;</span>
+            <h2>Comandos y Ayuda</h2>
+            <p>Aquí hay algunas cosas que puedes preguntarme o pedirme:</p>
+            <ul id="commandList">
+            </ul>
+            ---
+            <h3>Métricas de Soporte</h3>
+            <p>Tickets Totales: <span id="totalTickets">0</span></p>
+            <p>Resueltos por AI: <span id="autoResolved">0</span></p>
+            <p>Tasa de Resolución AI: <span id="autoRate">0%</span></p>
+        </div>
+    </div>
+
+    <div id="customAlertModal" class="modal">
+        <div class="modal-content alert-modal-content">
+            <span class="close-button" id="customAlertCloseButton">&times;</span>
+            <h2 id="customAlertTitle"></h2>
+            <p id="customAlertMessage"></p>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. VARIABLES DE ESTADO Y DATOS ---
+        let userName = null; // Se inicializa a null para pedirlo siempre al inicio
+        let currentAction = null; // Controla el flujo de conversación multi-paso (ej. 'agendar reunion', 'añadir contacto')
+        let pendingDetail = null; // Qué detalle específico estamos esperando en un flujo multi-paso (ej. 'date', 'time', 'name')
+
+        let tempEvent = { type: '', date: '', time: '', description: '' };
+        let tempTask = { id: null, description: '', completed: false };
+        let tempContact = { name: '', phone: '', email: '' };
+        let expectingName = false; // Esta variable ya no es estrictamente necesaria con el nuevo flujo
+        let chatHistory = []; // Para mantener el contexto con la IA
+
+        // Base de conocimiento técnica (para respuestas directas y simuladas)
+        const techKnowledgeBase = {
+            "wifi": {
+                "problems": ["lento", "no conecta", "intermitente", "desconecta"],
+                "solutions": {
+                    "lento": "1. Reinicia el router<br>2. Verifica dispositivos consumiendo ancho de banda<br>3. Cambia el canal WiFi en la configuración",
+                    "no conecta": "1. Revisa la contraseña<br>2. Reinicia el dispositivo<br>3. Verifica si el problema es con todos los dispositivos",
+                    "intermitente": "1. Cambia el canal del WiFi<br>2. Aleja el router de dispositivos electrónicos<br>3. Verifica la temperatura del router",
+                    "desconecta": "1. Actualiza el firmware del router<br>2. Verifica la configuración de energía<br>3. Prueba con un cable Ethernet"
+                }
+            },
+            "software": {
+                "problems": ["no abre", "se cierra", "error", "lento"],
+                "solutions": {
+                    "no abre": "1. Reinstala la aplicación<br>2. Verifica permisos<br>3. Comprueba requisitos del sistema",
+                    "se cierra": "1. Actualiza a la última versión<br>2. Revisa los logs de errores<br>3. Verifica conflictos con otros programas",
+                    "error": "Por favor, dime el código de error específico para ayudarte mejor.",
+                    "lento": "1. Cierra programas innecesarios<br>2. Aumenta la memoria asignada<br>3. Verifica actualizaciones"
+                }
+            },
+            "hardware": {
+                "problems": ["no enciende", "sobrecalienta", "ruido", "pantalla"],
+                "solutions": {
+                    "no enciende": "1. Verifica la conexión eléctrica<br>2. Prueba con otro cable de poder<br>3. Revisa la fuente de alimentación",
+                    "sobrecalienta": "1. Limpia los ventiladores<br>2. Verifica la pasta térmica<br>3. Mejora la ventilación del área",
+                    "ruido": "1. Identifica si es de ventiladores o discos<br>2. Limpia componentes internos<br>3. Verifica componentes mecánicos",
+                    "pantalla": "1. Prueba con otro cable/monitor<br>2. Verifica conexiones<br>3. Revisa configuración de gráficos"
+                }
+            }
+        };
+
+        // Métricas de soporte
+        let supportMetrics = {
+            totalTickets: 0,
+            autoResolved: 0,
+            avgResponseTime: 0, // Esto requeriría lógica de tiempo más avanzada
+            userRatings: []
+        };
+
+        // Arrays para almacenar datos (se cargarán desde localStorage)
+        let scheduledEvents = [];
+        let tasks = [];
+        let contacts = [];
+        let tickets = []; // Para los tickets de soporte
+
+        // --- 2. REFERENCIAS A ELEMENTOS DEL DOM ---
+        const chatBox = document.getElementById('chatBox');
+        let typingIndicator = document.getElementById('typingIndicator'); // Cambiado a 'let'
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const closeHelpModal = document.getElementById('closeHelpModal');
+        const commandList = document.getElementById('commandList');
+        const calendarInput = document.getElementById('calendarInput');
+        const customAlertModal = document.getElementById('customAlertModal');
+        const customAlertTitle = document.getElementById('customAlertTitle');
+        const customAlertMessage = document.getElementById('customAlertMessage');
+        const customAlertCloseButton = document.getElementById('customAlertCloseButton');
+        const totalTicketsElement = document.getElementById('totalTickets');
+        const autoResolvedElement = document.getElementById('autoResolved');
+        const autoRateElement = document.getElementById('autoRate');
+        // const resetChatButton ya no es necesario
+
+        // --- 3. FUNCIONES AUXILIARES ---
+
+        // Función para añadir un mensaje al chat
+        function appendMessage(sender, text, isTech = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            
+            if (sender === 'user') {
+                messageDiv.classList.add('user-message');
+            } else {
+                messageDiv.classList.add(isTech ? 'tech-message' : 'syncronix-message');
+            }
+            
+            messageDiv.innerHTML = text;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Guardar en historial
+            chatHistory.push({ role: sender === 'user' ? 'user' : 'assistant', content: text });
+            if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+        }
+
+        // Función para mostrar el indicador de "escribiendo..."
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'block';
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Función para ocultar el indicador de "escribiendo..."
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        // Función para mostrar un modal de alerta personalizado
+        function showAlert(title, message) {
+            customAlertTitle.textContent = title;
+            customAlertMessage.textContent = message;
+            customAlertModal.style.display = 'flex';
+        }
+
+        // Función para resetear las variables de estado de flujo
+        function resetStates() {
+            currentAction = null;
+            pendingDetail = null;
+            tempEvent = { type: '', date: '', time: '', description: '' };
+            tempTask = { id: null, description: '', completed: false };
+            tempContact = { name: '', phone: '', email: '' };
+            hideTypingIndicator();
+        }
+
+        // Función para el modal de ayuda
+        function showHelpModal() {
+            const commands = [
+                'Hola', 'Quién eres', 'Quién te creó', 'Qué hora es',
+                'Agendar reunión', 'Poner una alarma', 'Poner un recordatorio',
+                'Añadir tarea', 'Ver tareas', 'Completar tarea', 'Eliminar tarea',
+                'Añadir contacto', 'Ver contactos', 'Buscar contacto',
+                'Problema con internet', 'Mi computadora está lenta', 'Error de software',
+                'Crear ticket', 'Estado de mi ticket', 'Necesito ayuda',
+            ];
+            commandList.innerHTML = commands.map(cmd => `<li>Puedes decir: "<strong>${cmd}</strong>"</li>`).join('');
+            helpModal.style.display = 'flex';
+        }
+
+        // Determina el saludo apropiado según la hora del día
+        function getGreetingBasedOnTime() {
+            const hour = new Date().getHours();
+            if (hour >= 5 && hour < 12) return '¡Buenos días';
+            if (hour >= 12 && hour < 19) return '¡Buenas tardes';
+            return '¡Buenas noches';
+        }
+
+        // Mensaje de bienvenida inicial
+        function initialGreeting() {
+            // Limpiar el chatbox al iniciar o reiniciar
+            chatBox.innerHTML = '<div id="typingIndicator" class="typing-indicator"></div>';
+            // Re-obtener la referencia al typingIndicator después de limpiar el chatBox
+            typingIndicator = document.getElementById('typingIndicator'); // Reasignación permitida con 'let'
+
+            // Siempre se pedirá el nombre al iniciar la página
+            appendMessage('syncronix', `${getGreetingBasedOnTime()}! Soy SynCronix, tu asistente de soporte técnico. ¿Cómo te llamas?`);
+            userInput.placeholder = "Escribe tu nombre...";
+            currentAction = 'gettingName'; // Asegura que el flujo de obtener el nombre se active
+            
+            userInput.focus();
+            updateMetricsDisplay();
+        }
+
+        // Maneja la consulta de hora y fecha actual
+        function handleTimeAndDateQuery() {
+            const now = new Date();
+            const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const timeString = now.toLocaleTimeString('es-VE', timeOptions);
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('es-VE', dateOptions);
+            appendMessage('syncronix', `Son las ${timeString} del ${dateString}.`);
+            resetStates();
+        }
+
+        // Inicia el flujo para agendar una reunión/alarma/recordatorio
+        function startScheduleEvent(type) {
+            currentAction = type;
+            pendingDetail = 'date';
+            const eventTypeDisplay = type === 'meeting' ? 'reunión' : (type === 'alarm' ? 'alarma' : 'recordatorio');
+            appendMessage('syncronix', `Claro, ¿para qué día quieres ${eventTypeDisplay}? Puedes decirme la fecha (ejemplo: "21/07/2025" o "21 de julio de 2025") o seleccionar en el calendario.`);
+            showCalendar();
+        }
+
+        // Maneja los detalles de fecha, hora y descripción para eventos
+        function handleEventDetails(userText) {
+            if (pendingDetail === 'date') {
+                const date = parseDate(userText);
+                if (date) {
+                    tempEvent.date = date;
+                    pendingDetail = 'time';
+                    appendMessage('syncronix', '¡Fecha registrada! Ahora, ¿a qué hora? (ejemplo: "3 PM" o "15:00") ');
+                    calendarInput.style.display = 'none';
+                } else {
+                    appendMessage('syncronix', 'No pude entender la fecha. Por favor, intenta un formato como "DD/MM/AAAA", "hoy" o "mañana", o selecciona en el calendario.');
+                    showCalendar();
+                }
+            } else if (pendingDetail === 'time') {
+                const time = parseTime(userText);
+                if (time) {
+                    tempEvent.time = time;
+                    pendingDetail = 'description';
+                    appendMessage('syncronix', `Hora registrada. Ahora, ¿cuál es la descripción de este ${currentAction === 'meeting' ? 'reunión' : (currentAction === 'alarm' ? 'alarma' : 'recordatorio')}?`);
+                } else {
+                    appendMessage('syncronix', 'No pude entender la hora. Por favor, intenta un formato como "3 PM", "15:00" o "a las 10:30".');
+                }
+            } else if (pendingDetail === 'description') {
+                tempEvent.description = userText;
+                pendingDetail = null;
+
+                if (currentAction === 'setReminder') {
+                    setBrowserReminder(tempEvent.date, tempEvent.time, tempEvent.description);
+                    appendMessage('syncronix', `¡Recordatorio programado para el "${tempEvent.date}" a las "${tempEvent.time}": "${tempEvent.description}". Te notificaré en el navegador.`);
+                } else {
+                    scheduledEvents.push({
+                        id: Date.now(),
+                        type: currentAction,
+                        date: tempEvent.date,
+                        time: tempEvent.time,
+                        description: tempEvent.description
+                    });
+                    saveAllData();
+                    const eventTypeDisplay = currentAction === 'meeting' ? 'reunión' : 'alarma';
+                    appendMessage('syncronix', `¡Listo, ${userName}! Tu "${eventTypeDisplay}" ha sido agendada para el "${tempEvent.date}" a las "${tempEvent.time}": "${tempEvent.description}". ¿Hay algo más en lo que pueda ayudarte hoy?`);
+                }
+                resetStates();
+            }
+        }
+
+        // Establece un recordatorio que aparecerá como una alerta en el navegador
+        function setBrowserReminder(dateStr, timeStr, description) {
+            const [day, month, year] = dateStr.split('/').map(Number);
+            const [hour, minute] = timeStr.split(':').map(Number);
+
+            const reminderDate = new Date(year, month - 1, day, hour, minute, 0);
+            const now = new Date();
+
+            if (reminderDate <= now) {
+                showAlert('Error de Recordatorio', 'La fecha y hora del recordatorio deben ser en el futuro.');
+                return;
+            }
+
+            const timeToReminder = reminderDate.getTime() - now.getTime();
+
+            setTimeout(() => {
+                showAlert('Recordatorio SynCronix', `¡Es hora de: ${description}! (${dateStr} a las ${timeStr})`);
+            }, timeToReminder);
+        }
+
+        // Inicia el flujo para añadir una tarea
+        function startAddTask() {
+            currentAction = 'addTask';
+            pendingDetail = 'description';
+            appendMessage('syncronix', '¿Cuál es la descripción de la tarea que quieres añadir?');
+        }
+
+        // Maneja la descripción de la tarea
+        function handleAddTaskDescription(userText) {
+            tempTask.description = userText;
+            tempTask.id = Date.now();
+            tasks.push(tempTask);
+            saveAllData();
+            appendMessage('syncronix', `¡Tarea "${tempTask.description}" añadida a tu lista!`);
+            resetStates();
+        }
+
+        // Lista todas las tareas
+        function listTasks() {
+            if (tasks.length === 0) {
+                appendMessage('syncronix', 'No tienes tareas pendientes.');
+                return;
+            }
+            let response = 'Aquí está tu lista de tareas:\n';
+            tasks.forEach((task, index) => {
+                const status = task.completed ? '✅' : '⏳';
+                response += `\n${index + 1}. ${status} ${task.description}`;
+            });
+            appendMessage('syncronix', response);
+            resetStates();
+        }
+
+        // Inicia el flujo para marcar una tarea como completada
+        function startCompleteTask() {
+            currentAction = 'completeTask';
+            pendingDetail = 'taskId';
+            listTasks();
+            appendMessage('syncronix', '¿Qué número de tarea quieres marcar como completada?');
+        }
+
+        // Maneja la marcación de tarea como completada
+        function handleCompleteTask(userText) {
+            const taskNumber = parseInt(userText);
+            if (isNaN(taskNumber) || taskNumber <= 0 || taskNumber > tasks.length) {
+                appendMessage('syncronix', 'Por favor, introduce un número de tarea válido.');
+                return;
+            }
+            tasks[taskNumber - 1].completed = true;
+            saveAllData();
+            appendMessage('syncronix', `¡Tarea "${tasks[taskNumber - 1].description}" marcada como completada!`);
+            resetStates();
+        }
+
+        // Inicia el flujo para eliminar una tarea
+        function startDeleteTask() {
+            currentAction = 'deleteTask';
+            pendingDetail = 'taskId';
+            listTasks();
+            appendMessage('syncronix', '¿Qué número de tarea quieres eliminar?');
+        }
+
+        // Maneja la eliminación de una tarea
+        function handleDeleteTask(userText) {
+            const taskNumber = parseInt(userText);
+            if (isNaN(taskNumber) || taskNumber <= 0 || taskNumber > tasks.length) {
+                appendMessage('syncronix', 'Por favor, introduce un número de tarea válido.');
+                return;
+            }
+            const deletedTask = tasks.splice(taskNumber - 1, 1);
+            saveAllData();
+            appendMessage('syncronix', `¡Tarea "${deletedTask[0].description}" eliminada!`);
+            resetStates();
+        }
+
+        // Inicia el flujo para cancelar un evento
+        function startCancelEvent() {
+            currentAction = 'cancelEvent';
+            pendingDetail = 'eventId';
+            if (scheduledEvents.length === 0) {
+                appendMessage('syncronix', 'No tienes reuniones o alarmas agendadas para cancelar.');
+                resetStates();
+                return;
+            }
+            let response = 'Aquí están tus eventos agendados:\n';
+            scheduledEvents.forEach((event, index) => {
+                const eventTypeDisplay = event.type === 'meeting' ? 'Reunión' : 'Alarma';
+                response += `\n${index + 1}. "${eventTypeDisplay}" el ${event.date} a las "${event.time}": "${event.description}"`;
+            });
+            appendMessage('syncronix', response);
+            appendMessage('syncronix', '¿Qué número de evento quieres cancelar?');
+        }
+
+        // Maneja la cancelación de un evento
+        function handleCancelEvent(userText) {
+            const eventNumber = parseInt(userText);
+            if (isNaN(eventNumber) || eventNumber <= 0 || eventNumber > scheduledEvents.length) {
+                appendMessage('syncronix', 'Por favor, introduce un número de evento válido.');
+                return;
+            }
+            const canceledEvent = scheduledEvents.splice(eventNumber - 1, 1);
+            saveAllData();
+            const eventTypeDisplay = canceledEvent[0].type === 'meeting' ? 'reunión' : 'alarma';
+            appendMessage('syncronix', `¡Tu ${eventTypeDisplay} "${canceledEvent[0].description}" ha sido cancelada!`);
+            resetStates();
+        }
+
+        // Inicia el flujo para añadir un contacto
+        function startAddContact() {
+            currentAction = 'addContact';
+            pendingDetail = 'contactName';
+            appendMessage('syncronix', 'Para añadir un contacto, ¿cuál es su nombre?');
+        }
+
+        // Maneja los detalles para añadir un contacto
+        function handleAddContactDetails(userText) {
+            if (pendingDetail === 'contactName') {
+                tempContact.name = userText;
+                pendingDetail = 'contactPhone';
+                appendMessage('syncronix', `Ok, ¿cuál es el número de teléfono de ${tempContact.name}?`);
+            } else if (pendingDetail === 'contactPhone') {
+                tempContact.phone = userText;
+                pendingDetail = 'contactEmail';
+                appendMessage('syncronix', `Y, ¿cuál es su dirección de correo electrónico? (Puedes decir "no" si no tiene)`);
+            } else if (pendingDetail === 'contactEmail') {
+                tempContact.email = userText.toLowerCase() === 'no' ? '' : userText;
+                contacts.push(tempContact);
+                saveAllData();
+                appendMessage('syncronix', `¡Contacto ${tempContact.name} añadido! Teléfono: ${tempContact.phone}, Email: ${tempContact.email || 'N/A'}.`);
+                resetStates();
+            }
+        }
+
+        // Lista todos los contactos
+        function listContacts() {
+            if (contacts.length === 0) {
+                appendMessage('syncronix', 'No tienes contactos guardados.');
+                return;
+            }
+            let response = 'Aquí están tus contactos:\n';
+            contacts.forEach((contact, index) => {
+                response += `\n${index + 1}. "${contact.name}" - Tel: ${contact.phone}, Email: ${contact.email || 'N/A'}`;
+            });
+            appendMessage('syncronix', response);
+            resetStates();
+        }
+
+        // Inicia el flujo para buscar un contacto
+        function startFindContact() {
+            currentAction = 'findContact';
+            pendingDetail = 'contactName';
+            appendMessage('syncronix', '¿Qué contacto quieres buscar? Por favor, dime su nombre.');
+        }
+
+        // Maneja la búsqueda de un contacto
+        function handleFindContact(userText) {
+            const searchTerm = userText.toLowerCase();
+            const foundContact = contacts.find(contact => contact.name.toLowerCase().includes(searchTerm));
+
+            if (foundContact) {
+                appendMessage('syncronix', `Encontré a "${foundContact.name}": Teléfono: ${foundContact.phone}, Email: ${foundContact.email || 'N/A'}.`);
+            } else {
+                appendMessage('syncronix', `Lo siento, no encontré ningún contacto con el nombre "${userText}".`);
+            }
+            resetStates();
+        }
+
+        // Responde a la pregunta sobre los creadores del bot
+        function handleCreatorsQuery() {
+            appendMessage('syncronix', 'Fui creado por Oscar Jimenez, Isaac Martinez y Miguel Montenegro, estudiantes del Politécnico Santiago Mariño extensión Caracas.');
+            resetStates();
+        }
+
+        // Parsea y formatea una fecha a partir de un texto
+        function parseDate(text) {
+            let dateMatch = text.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})|(\d{4}-\d{2}-\d{2})/);
+            if (dateMatch) {
+                const parts = dateMatch[0].includes('/') ? dateMatch[0].split('/') : dateMatch[0].split('-');
+                let day = parts[0];
+                let month = parts[1];
+                let year = parts[2];
+                if (dateMatch[0].includes('-')) {
+                    [year, month, day] = parts;
+                }
+                return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+            }
+            const monthNames = {
+                "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
+                "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
+            };
+            const naturalDateMatch = text.match(/(\d{1,2}) de ([a-záéíóú]+)( de (\d{4}))?/i);
+            if (naturalDateMatch) {
+                let day = naturalDateMatch[1];
+                let month = monthNames[naturalDateMatch[2].toLowerCase()];
+                let year = naturalDateMatch[4] || new Date().getFullYear().toString();
+                if (day.length === 1) day = '0' + day;
+                return `${day}/${month}/${year}`;
+            }
+
+            const today = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+
+            if (text.includes('hoy')) {
+                return today.toLocaleDateString('es-VE');
+            } else if (text.includes('mañana')) {
+                return tomorrow.toLocaleDateString('es-VE');
+            }
+            return null;
+        }
+
+        // Parsea y formatea una hora a partir de un texto
+        function parseTime(text) {
+            const timeRegex = /(\d{1,2}(:\d{2})?\s*(am|pm)?)|(a las \d{1,2}(:\d{2})?\s*(am|pm)?)/i;
+            let match = text.match(timeRegex);
+            if (match) {
+                let timeStr = match[0].replace('a las ', '').trim();
+                let [hour, minute] = timeStr.split(':');
+                let ampm = '';
+
+                if (minute) {
+                    minute = minute.match(/\d{2}/) ? minute.match(/\d{2}/)[0] : '00';
+                    ampm = timeStr.match(/(am|pm)/i);
+                } else {
+                    minute = '00';
+                    ampm = timeStr.match(/(am|pm)/i);
+                    hour = timeStr.match(/\d{1,2}/)[0];
+                }
+
+                if (ampm && ampm[0].toLowerCase() === 'pm' && parseInt(hour) < 12) {
+                    hour = parseInt(hour) + 12;
+                } else if (ampm && ampm[0].toLowerCase() === 'am' && parseInt(hour) === 12) {
+                    hour = 0;
+                }
+
+                return `${String(hour).padStart(2, '0')}:${minute}`;
+            }
+            return null;
+        }
+
+        function showCalendar() {
+            calendarInput.style.display = 'block';
+            calendarInput.focus();
+            calendarInput.value = '';
+            // El manejo de la selección del calendario ahora se hace en el event listener general para calendarInput
+        }
+
+        // Actualiza y muestra las métricas de soporte
+        function updateMetrics(solvedByAI = false) {
+            supportMetrics.totalTickets++;
+            if (solvedByAI) supportMetrics.autoResolved++;
+            saveAllData(); // Guarda las métricas
+            updateMetricsDisplay();
+        }
+
+        // Muestra las métricas en el modal de ayuda
+        function updateMetricsDisplay() {
+            totalTicketsElement.textContent = supportMetrics.totalTickets;
+            autoResolvedElement.textContent = supportMetrics.autoResolved;
+            const rate = supportMetrics.totalTickets > 0
+                ? Math.round((supportMetrics.autoResolved / supportMetrics.totalTickets) * 100)
+                : 0;
+            autoRateElement.textContent = `${rate}%`;
+        }
+
+        // Simula la escalada a un agente humano
+        function escalateToHuman(reason) {
+            appendMessage('syncronix', `⚠️ Entendido. Estoy transfiriéndote a un agente humano. Motivo: ${reason}.`, true);
+            updateMetrics(false); // No se resolvió automáticamente
+
+            // Simular espera y respuesta del humano
+            setTimeout(() => {
+                appendMessage('syncronix', `👋 Hola ${userName || 'cliente'}, soy Carlos del equipo de soporte. He revisado la conversación con SynCronix. Por favor, describe tu problema con más detalles para que pueda ayudarte.`, true);
+            }, 3000);
+        }
+
+        // Simula la creación de un ticket de soporte
+        function createTicket(description) {
+            const ticketNumber = 'T-' + Math.floor(Math.random() * 10000);
+            const newTicket = {
+                id: ticketNumber,
+                description: description,
+                date: new Date().toLocaleString(),
+                status: 'Abierto',
+                assignedTo: null
+            };
+            
+            tickets.push(newTicket);
+            saveAllData();
+            return ticketNumber;
+        }
+
+        // Simula la consulta del estado de un ticket
+        function checkTicketStatus(ticketInfo) {
+            const foundTicket = tickets.find(t => t.id.toLowerCase() === ticketInfo.toLowerCase() || t.description.toLowerCase().includes(ticketInfo.toLowerCase()));
+            if (foundTicket) {
+                appendMessage('syncronix', `El ticket **${foundTicket.id}** (Descripción: "${foundTicket.description}") está actualmente **${foundTicket.status}**. Fue creado el ${foundTicket.date}.`, true);
+            } else {
+                appendMessage('syncronix', `No encontré ningún ticket con la información proporcionada "${ticketInfo}". Por favor, verifica el número de ticket o la descripción.`, true);
+            }
+            resetStates();
+        }
+
+        // Guarda todos los datos en localStorage
+        function saveAllData() {
+            localStorage.setItem('syncronixEvents', JSON.stringify(scheduledEvents));
+            localStorage.setItem('syncronixTasks', JSON.stringify(tasks));
+            localStorage.setItem('syncronixContacts', JSON.stringify(contacts));
+            localStorage.setItem('syncronixTickets', JSON.stringify(tickets));
+            localStorage.setItem('supportMetrics', JSON.stringify(supportMetrics));
+            // Ya no se guarda userName aquí
+        }
+
+        // Carga todos los datos desde localStorage
+        function loadAllData() {
+            const savedEvents = localStorage.getItem('syncronixEvents');
+            if (savedEvents) scheduledEvents = JSON.parse(savedEvents);
+            
+            const savedTasks = localStorage.getItem('syncronixTasks');
+            if (savedTasks) tasks = JSON.parse(savedTasks);
+            
+            const savedContacts = localStorage.getItem('syncronixContacts');
+            if (savedContacts) contacts = JSON.parse(savedContacts);
+            
+            const savedTickets = localStorage.getItem('syncronixTickets');
+            if (savedTickets) tickets = JSON.parse(savedTickets);
+            
+            const savedMetrics = localStorage.getItem('supportMetrics');
+            if (savedMetrics) supportMetrics = JSON.parse(savedMetrics);
+            
+            // userName ya no se carga de localStorage
+            userName = null; // Asegura que userName siempre sea nulo al cargar
+        }
+
+        // --- 4. FUNCIONES DE SOPORTE TÉCNICO ESPECÍFICAS (BASADAS EN REGLAS) ---
+        function handleTechIssue(category, problem) {
+            const solution = techKnowledgeBase[category].solutions[problem];
+            if (solution) {
+                appendMessage('syncronix', `🔧 Problema detectado: ${category} - ${problem}.<br><br>Solución recomendada:<br>${solution}`, true);
+                
+                // Preguntar si la solución funcionó
+                setTimeout(() => {
+                    appendMessage('syncronix', '¿Esta solución resolvió tu problema? (Sí/No)', true);
+                    currentAction = 'verifySolution';
+                    pendingDetail = { category, problem };
+                }, 1000);
+                
+                updateMetrics(true); // Se intentó resolver automáticamente
+                return true;
+            }
+            return false;
+        }
+
+        // --- FUNCIÓN SIMULADA DE LLAMADA A LA API DE GEMINI (IA) ---
+        // ESTA ES LA CLAVE PARA LAS RESPUESTAS DINÁMICAS
+        async function callGeminiAPI(prompt) {
+            showTypingIndicator();
+            
+            // *** IMPORTANTE: Esta es una SIMULACIÓN de la llamada a la API de Gemini. ***
+            // *** Para una integración real, necesitarías un backend que maneje tu API Key de forma segura. ***
+            // *** Reemplaza esta lógica con una llamada 'fetch' real a tu backend o directamente a la API de Gemini (con precaución). ***
+            // Ejemplo de cómo se vería una llamada real (NO USAR EN PRODUCCIÓN DIRECTAMENTE EN EL FRONTEND):
+            /*
+            const apiKey = "TU_API_KEY_AQUI"; // Si no usas backend, pon tu API Key aquí (NO RECOMENDADO EN PRODUCCIÓN)
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: chatHistory, // Envía el historial completo para contexto
+                generationConfig: {
+                    responseMimeType: "text/plain" // O "application/json" si esperas JSON estructurado
+                }
+            };
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                return result.candidates[0].content.parts[0].text;
+            } else {
+                return "Lo siento, la IA no pudo generar una respuesta en este momento.";
+            }
+            */
+
+            try {
+                // Simular tiempo de respuesta de la IA
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                let responseText;
+                const lowerPrompt = prompt.toLowerCase();
+
+                // Respuestas simuladas más dinámicas basadas en el prompt
+                if (lowerPrompt.includes("internet") || lowerPrompt.includes("wifi") || lowerPrompt.includes("conexion")) {
+                    responseText = "Para problemas de conexión a internet, por favor, intenta lo siguiente:<br>1. Desconecta tu router de la corriente por 30 segundos y vuelve a conectarlo.<br>2. Asegúrate de que todos los cables estén bien conectados.<br>3. Si estás en Wi-Fi, intenta acercarte al router o reiniciar tu dispositivo.<br><br>¿Esto ayudó a resolver tu problema?";
+                } else if (lowerPrompt.includes("software") || lowerPrompt.includes("programa") || lowerPrompt.includes("aplicacion")) {
+                    responseText = "Entiendo que tienes un problema con un software o aplicación. Para poder ayudarte, ¿podrías decirme el nombre del programa y qué error específico te aparece (si hay alguno)?";
+                } else if (lowerPrompt.includes("hardware") || lowerPrompt.includes("equipo") || lowerPrompt.includes("pc") || lowerPrompt.includes("computadora")) {
+                    responseText = "Para problemas de hardware, es importante ser específico. ¿Qué componente está fallando (pantalla, teclado, disco duro, etc.) y qué síntomas observas (ruidos, no enciende, sobrecalentamiento)?";
+                } else if (lowerPrompt.includes("no entiendo") || lowerPrompt.includes("no se que hacer") || lowerPrompt.includes("ayuda")) {
+                    responseText = "No te preocupes, estoy aquí para ayudarte. Por favor, describe tu problema técnico con tus propias palabras o dime qué tipo de dispositivo está fallando (por ejemplo, 'mi teléfono no carga', 'la impresora no imprime').";
+                } else if (lowerPrompt.includes("gracias") || lowerPrompt.includes("ok") || lowerPrompt.includes("perfecto")) {
+                    responseText = "De nada, ¡me alegra haberte sido útil! ¿Hay algo más en lo que pueda asistirte hoy?";
+                }
+                else {
+                    // Respuesta genérica si la IA no tiene una respuesta específica simulada
+                    responseText = "Entiendo. Para poder ayudarte mejor con tu problema técnico, por favor, sé lo más específico posible. Dime qué dispositivo está involucrado y qué está ocurriendo exactamente.";
+                }
+                
+                appendMessage('syncronix', responseText, true); // Usar estilo técnico para respuestas de IA
+                updateMetrics(true); // Contar como intento de resolución automática
+                return responseText; // Retorna la respuesta generada
+            } catch (error) {
+                console.error("Error al llamar a la API de Gemini (simulada):", error);
+                appendMessage('syncronix', "Disculpa, estoy teniendo dificultades para procesar tu solicitud en este momento. Por favor, intenta de nuevo más tarde o describe tu problema de forma diferente.");
+                updateMetrics(false); // No se resolvió automáticamente
+                return "Error en la IA."; // Mensaje de fallback
+            } finally {
+                hideTypingIndicator();
+            }
+        }
+
+        // --- 5. FUNCIÓN PRINCIPAL DE PROCESAMIENTO DE MENSAJES (¡LA CLAVE!) ---
+        async function processUserMessage(userText) {
+            appendMessage('user', userText); // Muestra el mensaje del usuario
+            userInput.value = ''; // Limpia el input
+
+            // Paso 1: Manejar flujos multi-paso activos (prioridad alta)
+            if (currentAction === 'gettingName') {
+                userName = userText;
+                // NO GUARDAR userName en localStorage para que siempre pida el nombre
+                appendMessage('syncronix', `${getGreetingBasedOnTime()}, ${userName}! Soy SynCronix, tu asistente de soporte técnico. ¿En qué puedo ayudarte hoy?`);
+                currentAction = null;
+                userInput.placeholder = "Describe tu problema técnico...";
+                hideTypingIndicator();
+                return;
+            } else if (currentAction === 'verifySolution') {
+                if (userText.toLowerCase().includes('sí') || userText.toLowerCase().includes('si')) {
+                    appendMessage('syncronix', '¡Me alegra haber ayudado! ¿Hay algo más en lo que pueda asistirte?', true);
+                    supportMetrics.userRatings.push(5); // Calificación implícita
+                    saveAllData();
+                } else {
+                    appendMessage('syncronix', 'Lamento que no haya funcionado. Voy a transferirte a un técnico humano para ayuda especializada.', true);
+                    escalateToHuman('Solución automática no efectiva');
+                }
+                resetStates();
+                return;
+            } else if (currentAction === 'createTicket') {
+                const ticketNumber = createTicket(userText);
+                appendMessage('syncronix', `✅ Ticket creado con éxito (#${ticketNumber}). Un técnico se contactará contigo pronto.`, true);
+                resetStates();
+                return;
+            } else if (currentAction === 'checkTicketStatus' && pendingDetail === 'ticketInfo') {
+                checkTicketStatus(userText);
+                return;
+            } else if (currentAction === 'addContact' && pendingDetail) {
+                handleAddContactDetails(userText);
+                hideTypingIndicator();
+                return;
+            } else if (currentAction === 'addTask' && pendingDetail === 'description') {
+                handleAddTaskDescription(userText);
+                hideTypingIndicator();
+                return;
+            } else if (currentAction === 'completeTask' && pendingDetail === 'taskId') {
+                handleCompleteTask(userText);
+                hideTypingIndicator();
+                return;
+            } else if (currentAction === 'deleteTask' && pendingDetail === 'taskId') {
+                handleDeleteTask(userText);
+                hideTypingIndicator();
+                return;
+            } else if (currentAction === 'cancelEvent' && pendingDetail === 'eventId') {
+                handleCancelEvent(userText);
+                hideTypingIndicator();
+                return;
+            } else if (['meeting', 'alarm', 'setReminder'].includes(currentAction) && pendingDetail) {
+                handleEventDetails(userText);
+                hideTypingIndicator();
+                return;
+            } else if (currentAction === 'findContact' && pendingDetail === 'contactName') {
+                handleFindContact(userText);
+                hideTypingIndicator();
+                return;
+            }
+
+
+            // Paso 2: Búsqueda en base de conocimiento técnica (reglas directas)
+            const lowerText = userText.toLowerCase();
+            let foundSolution = false;
+
+            for (const [category, data] of Object.entries(techKnowledgeBase)) {
+                if (lowerText.includes(category)) {
+                    for (const problem of data.problems) {
+                        if (lowerText.includes(problem)) {
+                            foundSolution = handleTechIssue(category, problem);
+                            if (foundSolution) break;
+                        }
+                    }
+                    if (foundSolution) break;
+                }
+            }
+
+            if (foundSolution) return; // Si se encontró una solución por reglas, termina aquí
+
+
+            // Paso 3: Manejar comandos directos (sin IA o con IA mínima)
+            if (lowerText.includes('hora') || lowerText.includes('fecha') || lowerText.includes('día')) {
+                handleTimeAndDateQuery();
+            } else if (lowerText.includes('quien te creo') || lowerText.includes('quien te hizo') || lowerText.includes('desarrolladores')) {
+                handleCreatorsQuery();
+            } else if (lowerText.includes('hola') || lowerText.includes('buenos dias') || lowerText.includes('buenas tardes') || lowerText.includes('buenas noches')) {
+                // Si el usuario saluda después de haber dado su nombre en la sesión actual
+                if (userName) {
+                    appendMessage('syncronix', `${getGreetingBasedOnTime()}, ${userName}! ¿En qué puedo ayudarte hoy?`);
+                } else {
+                    // Esto no debería ocurrir si currentAction es 'gettingName' al inicio
+                    // Pero como fallback, si el usuario saluda sin nombre, se le pide.
+                    appendMessage('syncronix', `${getGreetingBasedOnTime()}! ¿Cómo te llamas?`);
+                    currentAction = 'gettingName';
+                    userInput.placeholder = "Escribe tu nombre...";
+                }
+            } else if (lowerText.includes('agenda reunion') || lowerText.includes('agendar reunion') || lowerText.includes('programar reunion')) {
+                startScheduleEvent('meeting');
+            } else if (lowerText.includes('pon una alarma') || lowerText.includes('crear alarma') || lowerText.includes('agendar alarma')) {
+                startScheduleEvent('alarm');
+            } else if (lowerText.includes('recordatorio') || lowerText.includes('pon un recordatorio')) {
+                startScheduleEvent('setReminder');
+            } else if (lowerText.includes('añadir tarea') || lowerText.includes('agregar tarea') || lowerText.includes('crear tarea')) {
+                startAddTask();
+            } else if (lowerText.includes('ver tareas') || lowerText.includes('listar tareas') || lowerText.includes('mis tareas')) {
+                listTasks();
+            } else if (lowerText.includes('completar tarea') || lowerText.includes('finalizar tarea')) {
+                startCompleteTask();
+            } else if (lowerText.includes('eliminar tarea') || lowerText.includes('borrar tarea')) {
+                startDeleteTask();
+            } else if (lowerText.includes('cancelar evento') || lowerText.includes('borrar evento') || lowerText.includes('eliminar reunion')) {
+                startCancelEvent();
+            } else if (lowerText.includes('añadir contacto') || lowerText.includes('agregar contacto')) {
+                startAddContact();
+            } else if (lowerText.includes('ver contactos') || lowerText.includes('listar contactos') || lowerText.includes('mis contactos')) {
+                listContacts();
+            } else if (lowerText.includes('buscar contacto') || lowerText.includes('encontrar contacto')) {
+                startFindContact();
+            } else if (lowerText.includes('necesito ayuda') || lowerText.includes('ayuda') || lowerText.includes('comandos')) {
+                showHelpModal();
+            } else if (lowerText.includes('crear ticket') || lowerText.includes('abrir caso') || lowerText.includes('hablar con un tecnico')) {
+                appendMessage('syncronix', 'Entendido. Por favor, describe tu problema con el mayor detalle posible para crear un ticket de soporte.', true);
+                currentAction = 'createTicket';
+                pendingDetail = 'description';
+            } else if (lowerText.includes('estado de mi ticket') || lowerText.includes('donde va mi caso') || lowerText.includes('consultar ticket')) {
+                appendMessage('syncronix', 'Claro, ¿cuál es el número de tu ticket o tu número de cliente para consultar el estado?', true);
+                currentAction = 'checkTicketStatus';
+                pendingDetail = 'ticketInfo';
+            }
+            else {
+                // Paso 4: Si ninguna regla anterior se activó, llama a la IA para una respuesta dinámica
+                // Esto es lo que permite al chatbot responder a preguntas no predefinidas.
+                await callGeminiAPI(userText); // Llama a la función que interactúa con la API de IA (simulada)
+                resetStates(); // Podrías ajustar si reseteas o mantienes contexto según la respuesta de la IA
+            }
+        }
+
+        // --- 6. MANEJO DE EVENTOS (Listener de Clic y Teclas) ---
+        sendButton.addEventListener('click', () => {
+            const userText = userInput.value.trim();
+            if (userText) {
+                processUserMessage(userText);
+            }
+        });
+
+        userInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+
+        helpButton.addEventListener('click', showHelpModal);
+        closeHelpModal.addEventListener('click', () => {
+            helpModal.style.display = 'none';
+        });
+        window.addEventListener('click', (event) => {
+            if (event.target == helpModal) {
+                helpModal.style.display = 'none';
+            }
+        });
+
+        customAlertCloseButton.addEventListener('click', () => {
+            customAlertModal.style.display = 'none';
+        });
+        window.addEventListener('click', (event) => {
+            if (event.target == customAlertModal) {
+                customAlertModal.style.display = 'none';
+            }
+        });
+
+        // Event listener para el input de calendario (para usar la fecha seleccionada)
+        calendarInput.addEventListener('change', (event) => {
+            const selectedDate = event.target.value; // Formato YYYY-MM-DD
+            if (selectedDate) {
+                // Convierte a formato DD/MM/YYYY para tus funciones de parseDate
+                const [year, month, day] = selectedDate.split('-');
+                const formattedDate = `${day}/${month}/${year}`;
+                // Simula que el usuario escribió la fecha
+                processUserMessage(formattedDate);
+            }
+            calendarInput.style.display = 'none'; // Oculta el calendario después de seleccionar
+        });
+
+        // --- 7. INICIO DEL CHATBOT ---
+        // loadAllData() se llama para cargar otros datos persistentes (tareas, eventos, etc.)
+        // pero userName ya no se carga de localStorage.
+        loadAllData();
+        initialGreeting(); // Inicia la conversación con el saludo y pide el nombre.
+    </script>
+</body>
+</html>
