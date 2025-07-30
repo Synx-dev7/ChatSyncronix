@@ -1,0 +1,12 @@
+milyisaac7@gmail.com
+contra
+@789456123i@
+
+https://syncronix.netlify.app/
+
+AIzaSyBI0QxOjdc2-xZmMHE0D1W8Po2Mvg1Sf_8 key api
+
+
+const apiKey = "AIzaSyBI0QxOjdc2-xZmMHE0D1W8Po2Mvg1Sf_8"; // <--- PEGA TU CLAVE API DE GEMINI AQUÍ SI NO ESTÁS EN UN ENTORNO CANVAS
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
