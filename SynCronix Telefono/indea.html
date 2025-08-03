@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SynCronix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos base para una experiencia de pantalla completa en móviles */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: #020024; /* Color de fondo base */
+        }
+        
+        .chat-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            background: radial-gradient(circle at 75% 25%, #020024 0%, #090979 10%, #0653aa 38%, #00d4ff 100%);
+            background-attachment: fixed;
+            background-size: 200% 200%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Nuevo encabezado fijo */
+        .chat-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(2, 0, 36, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            z-index: 200;
+        }
+
+        .chat-header .header-title {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 10px;
+            padding-top: 70px; /* Añadir espacio para el header */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: flex-end;
+        }
+
+        .message-bubble.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble.syncronix {
+            justify-content: flex-start;
+        }
+
+        .message-bubble.info {
+            justify-content: center;
+            text-align: center;
+        }
+
+        .message-content {
+            padding: 12px 18px;
+            border-radius: 20px;
+            max-width: 80%;
+            position: relative;
+            font-size: 0.95em;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message-bubble.user .message-content {
+            background: #4A90E2; /* Azul claro */
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-bubble.syncronix .message-content {
+            background: #E5E5EA; /* Gris claro */
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-bubble.info .message-content {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 0.85em;
+            border-radius: 10px;
+            padding: 8px 15px;
+            box-shadow: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            margin: 5px 15px 15px 15px;
+            padding: 8px 15px;
+            background: #E5E5EA;
+            border-radius: 15px;
+            width: fit-content;
+        }
+
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: #999;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            to {
+                transform: translateY(-5px);
+                background-color: #666;
+            }
+        }
+        
+        .input-container {
+            position: sticky;
+            bottom: 0;
+            padding: 10px 15px;
+            background-color: transparent;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .chat-input {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            padding: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            color: #333;
+        }
+        
+        .chat-input input[type="text"]::placeholder {
+            color: #999;
+        }
+
+        .chat-input button {
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chat-input button.send-btn {
+            background-color: #4A90E2;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.1em;
+            margin-right: 5px;
+        }
+
+        .chat-input button:hover {
+            color: #333;
+        }
+
+        .quick-actions-container {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            position: absolute;
+            bottom: 70px;
+            left: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+        
+        .quick-actions-container.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .quick-actions-container button {
+            background-color: #f0f0f5;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #333;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .quick-actions-container button:hover {
+            background-color: #e0e0e5;
+            transform: translateY(-2px);
+        }
+
+        .quick-actions-container button i {
+            display: block;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        
+        /* Modales existentes */
+        .help-modal, .api-key-modal, .custom-alert-modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        .help-modal-content, .api-key-content, .custom-alert-content {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+            color: #333;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-messages {
+                padding-bottom: 90px; /* Espacio para la barra de entrada */
+            }
+            .chat-input {
+                padding: 5px;
+            }
+            .quick-actions-container {
+                bottom: 80px;
+            }
+        }
+        
+        /* Previene el zoom en iOS al enfocar inputs */
+        input, textarea, select {
+            font-size: 16px !important;
+        }
+
+        /* --- Nuevos estilos para el modal de ayuda --- */
+        .help-commands-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .help-commands-container h3 {
+            margin: 0;
+            color: #555;
+            font-size: 1em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .commands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+        
+        .command-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .command-card i {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .command-card span {
+            display: block;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .api-key-config-card {
+            grid-column: 1 / -1; /* Ocupa todo el ancho */
+            background: #e9f2ff;
+            border: 1-px solid #4A90E2;
+            color: #4A90E2;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .api-key-config-card i {
+            color: #4A90E2;
+        }
+
+        .api-key-config-card:hover {
+            background: #d4e7ff;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Encabezado con el nombre de la app -->
+        <div class="chat-header">
+            <span class="header-title">SynCronix</span>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <!-- Los mensajes se insertarán aquí por JavaScript -->
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <!-- Botones de comandos flotantes -->
+            <div class="quick-actions-container" id="quickActionsContainer">
+                <button id="quickHora">
+                    <i class="fas fa-clock" style="color: #4A90E2;"></i>
+                    <span>Hora</span>
+                </button>
+                <button id="quickFecha">
+                    <i class="fas fa-calendar-alt" style="color: #50C878;"></i>
+                    <span>Fecha</span>
+                </button>
+                <button id="quickAgenda">
+                    <i class="fas fa-tasks" style="color: #FF5733;"></i>
+                    <span>Agenda</span>
+                </button>
+                <button id="quickActividad">
+                    <i class="fas fa-lightbulb" style="color: #FFC300;"></i>
+                    <span>Actividad</span>
+                </button>
+                <button id="helpButton">
+                    <i class="fas fa-question-circle" style="color: #8E44AD;"></i>
+                    <span>Ayuda</span>
+                </button>
+            </div>
+
+            <!-- Barra de entrada de texto estilo Gemini -->
+            <div class="chat-input">
+                <button id="toggleQuickActions">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <input type="text" id="userInput" placeholder="Escribe tu mensaje aquí..." onkeypress="handleInput(event)">
+                <button id="sendButton" class="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales para ayuda, API Key y alertas (se ha mejorado el de ayuda) -->
+    <div id="helpModal" class="help-modal">
+        <div class="help-modal-content">
+            <span class="close-button" onclick="closeHelpModal()">&times;</span>
+            <h2>Comandos y Funcionalidades</h2>
+            <div class="help-commands-container" id="commandList">
+                <section>
+                    <h3>Funciones Principales</h3>
+                    <div class="commands-grid" id="commandListGeneral"></div>
+                </section>
+                <section>
+                    <h3>Comandos Avanzados (con API Key)</h3>
+                    <div class="commands-grid" id="commandListAdvanced"></div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div id="apiKeyModal" class="api-key-modal">
+        <div class="api-key-content">
+            <span class="close-button" onclick="closeApiKeyModal()">&times;</span>
+            <h3>Configurar Clave API de Gemini</h3>
+            <p>Ingresa tu clave API para habilitar respuestas avanzadas.</p>
+            <input type="password" id="apiKeyInput" placeholder="Ingresa tu clave API...">
+            <div class="api-key-buttons">
+                <button class="api-key-cancel" onclick="closeApiKeyModal()">Cancelar</button>
+                <button class="api-key-save" onclick="saveApiKey()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="customAlertModal" class="custom-alert-modal">
+        <div class="custom-alert-content">
+            <span class="close-button" onclick="closeCustomAlert()">&times;</span>
+            <h3 id="customAlertTitle"></h3>
+            <p id="customAlertMessage"></p>
+            <button onclick="closeCustomAlert()">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables y elementos del DOM
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const apiKeyModal = document.getElementById('apiKeyModal');
+        const customAlertModal = document.getElementById('customAlertModal');
+        const customAlertTitle = document.getElementById('customAlertTitle');
+        const customAlertMessage = document.getElementById('customAlertMessage');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const toggleQuickActionsButton = document.getElementById('toggleQuickActions');
+        const quickActionsContainer = document.getElementById('quickActionsContainer');
+
+        // Botones de acción rápida
+        const quickHoraButton = document.getElementById('quickHora');
+        const quickFechaButton = document.getElementById('quickFecha');
+        const quickAgendaButton = document.getElementById('quickAgenda');
+        const quickActividadButton = document.getElementById('quickActividad');
+
+        // Estado y configuración
+        let userName = '';
+        let expectingName = true;
+        let isTyping = false;
+        let apiKey = localStorage.getItem('geminiApiKey');
+        const API_URL_MODEL = 'gemini-2.5-flash-preview-05-20';
+
+        // Lista de comandos (para el modal de ayuda)
+        const commands = [
+            { name: "Hora y fecha actual", category: 'general', icon: "fas fa-clock" },
+            { name: "Agendar reunión", category: 'general', icon: "fas fa-calendar-check" },
+            { name: "Programar alarma", category: 'general', icon: "fas fa-bell" },
+            { name: "Quién te creó", category: 'general', icon: "fas fa-user-circle" },
+            { name: "Tu nombre", category: 'general', icon: "fas fa-robot" },
+            { name: "Generar una historia", category: 'advanced', icon: "fas fa-book" },
+            { name: "Escribir un poema", category: 'advanced', icon: "fas fa-feather" },
+            { name: "Traducir texto", category: 'advanced', icon: "fas fa-language" },
+            { name: "Generar ideas", category: 'advanced', icon: "fas fa-lightbulb" }
+        ];
+
+        // Funciones del chat
+        function appendMessage(sender, text) {
+            // El texto se usa directamente sin reemplazos
+            const messageBubble = document.createElement('div');
+            messageBubble.classList.add('message-bubble', sender);
+            
+            const messageContent = document.createElement('div');
+            messageContent.classList.add('message-content');
+            messageContent.textContent = text;
+            messageBubble.appendChild(messageContent);
+            
+            chatMessages.appendChild(messageBubble);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            hideQuickActions();
+        }
+
+        function showTypingIndicator() {
+            if (!isTyping) {
+                typingIndicator.style.display = 'flex';
+                isTyping = true;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        function hideTypingIndicator() {
+            if (isTyping) {
+                typingIndicator.style.display = 'none';
+                isTyping = false;
+            }
+        }
+
+        async function fetchGeminiResponse(prompt) {
+            if (!apiKey) {
+                showAlert('API Key Requerida', 'Por favor, configura tu clave API de Gemini para usar esta función.');
+                return 'Lo siento, no puedo procesar esta solicitud sin una clave API de Gemini.';
+            }
+
+            showTypingIndicator();
+
+            try {
+                // Modificación del prompt para solicitar una respuesta más corta y sin formato Markdown
+                const newPrompt = `Responde de manera breve y concisa a la siguiente solicitud, sin utilizar formato Markdown (como negritas, cursivas o listas): ${prompt}`;
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: newPrompt }] });
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${API_URL_MODEL}:generateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                hideTypingIndicator();
+                
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude generar una respuesta. Inténtalo de nuevo.';
+                return text;
+            } catch (error) {
+                hideTypingIndicator();
+                console.error('Error fetching from Gemini API:', error);
+                return 'Hubo un error al comunicarme con la IA. Por favor, revisa tu clave API o inténtalo más tarde.';
+            }
+        }
+
+        // Lógica de agendamiento (simplificada)
+        let scheduling = false;
+        let pendingDate = false;
+        let pendingTime = false;
+        let tempTask = '';
+
+        function resetStates() {
+            scheduling = false;
+            pendingDate = false;
+            pendingTime = false;
+            tempTask = '';
+        }
+
+        // Manejar el input inicial (el nombre)
+        function handleInitialInput(event) {
+            if (event.key === 'Enter' || event.type === 'click') {
+                const name = userInput.value.trim();
+                if (name && expectingName) {
+                    userName = name;
+                    appendMessage('user', userName);
+                    appendMessage('syncronix', `¡Bienvenido, ${userName}! ¿En qué puedo ayudarte hoy?`);
+                    userInput.value = '';
+                    userInput.placeholder = "Escribe tu mensaje aquí...";
+                    expectingName = false;
+                    userInput.onkeypress = handleInput;
+                    sendButton.onclick = sendMessage;
+                    userInput.focus();
+                } else if (!expectingName) {
+                    sendMessage();
+                }
+            }
+        }
+
+        async function handleInput(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const userText = userInput.value.trim();
+            if (userText === '') return;
+
+            appendMessage('user', userText);
+            userInput.value = '';
+
+            const lowerCaseText = userText.toLowerCase();
+
+            // Comandos básicos
+            if (lowerCaseText.includes('que hora es hoy') || lowerCaseText.includes('qué hora es')) {
+                const now = new Date();
+                appendMessage('syncronix', `Son las ${now.toLocaleTimeString('es-VE')}.`);
+            } else if (lowerCaseText.includes('quien te creo') || lowerCaseText.includes('tus creadores')) {
+                appendMessage('syncronix', 'Fui creado por Oscar Jimenez, Isaac Martinez y Miguel Montenegro, estudiantes del Politécnico Santiago Mariño extensión Caracas.');
+            } else if (lowerCaseText.includes('como te llamas') || lowerCaseText.includes('cuál es tu nombre')) {
+                appendMessage('syncronix', 'Mi nombre es SynCronix.');
+            }
+            // Lógica de agendamiento
+            else if (lowerCaseText.includes('agendar') || lowerCaseText.includes('programar') || lowerCaseText.includes('reunion') || lowerCaseText.includes('alarma')) {
+                scheduling = true;
+                pendingDate = true;
+                tempTask = lowerCaseText.includes('alarma') ? 'alarma' : 'reunión';
+                appendMessage('syncronix', `Claro, ¿para qué día quieres la ${tempTask}? (ejemplo: 21/07/2025)`);
+            } else if (scheduling && pendingDate) {
+                let dateMatch = userText.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
+                if (dateMatch) {
+                    const date = dateMatch[0];
+                    appendMessage('syncronix', `Entendido, ${tempTask} para el ${date}. ¿A qué hora? (ejemplo: 3 PM o 15:00)`);
+                    pendingDate = false;
+                    pendingTime = true;
+                } else {
+                    appendMessage('syncronix', 'Formato de fecha no válido. Por favor, usa el formato día/mes/año.');
+                }
+            } else if (scheduling && pendingTime) {
+                let timeMatch = userText.match(/(\d{1,2}(:\d{2})?\s*(am|pm)?)/i);
+                if (timeMatch) {
+                    const time = timeMatch[0];
+                    appendMessage('syncronix', `¡Listo! La ${tempTask} ha sido agendada para la hora ${time}.`);
+                    resetStates();
+                } else {
+                    appendMessage('syncronix', 'Formato de hora no válido. Por favor, usa un formato como "3 PM" o "15:00".');
+                }
+            }
+            // Si no es un comando especial, usar Gemini
+            else {
+                const geminiResponse = await fetchGeminiResponse(userText);
+                appendMessage('syncronix', geminiResponse);
+            }
+        }
+
+        // Modales
+        function showHelpModal() {
+            populateCommandList();
+            helpModal.style.display = 'flex';
+        }
+
+        function closeHelpModal() {
+            helpModal.style.display = 'none';
+        }
+
+        function showApiKeyModal() {
+            apiKeyModal.style.display = 'flex';
+        }
+
+        function closeApiKeyModal() {
+            apiKeyModal.style.display = 'none';
+        }
+
+        function saveApiKey() {
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const newKey = apiKeyInput.value.trim();
+            if (newKey) {
+                localStorage.setItem('geminiApiKey', newKey);
+                apiKey = newKey;
+                showAlert('Clave Guardada', 'Tu clave API de Gemini ha sido guardada y está lista para ser usada.');
+                closeApiKeyModal();
+            } else {
+                showAlert('Error', 'Por favor, introduce una clave API válida.');
+            }
+        }
+
+        function showAlert(title, message) {
+            customAlertTitle.textContent = title;
+            customAlertMessage.textContent = message;
+            customAlertModal.style.display = 'flex';
+        }
+
+        function closeCustomAlert() {
+            customAlertModal.style.display = 'none';
+        }
+
+        function populateCommandList() {
+            const generalList = document.getElementById('commandListGeneral');
+            const advancedList = document.getElementById('commandListAdvanced');
+            
+            generalList.innerHTML = '';
+            advancedList.innerHTML = '';
+            
+            // Generar las tarjetas de comandos
+            commands.forEach(command => {
+                const commandCard = document.createElement('div');
+                commandCard.classList.add('command-card');
+                commandCard.innerHTML = `
+                    <i class="${command.icon}"></i>
+                    <span>${command.name}</span>
+                `;
+                
+                // Añadir evento click
+                commandCard.addEventListener('click', () => {
+                    closeHelpModal();
+                    userInput.value = command.name;
+                    sendMessage();
+                });
+
+                if (command.category === 'general') {
+                    generalList.appendChild(commandCard);
+                } else {
+                    advancedList.appendChild(commandCard);
+                }
+            });
+
+            // Tarjeta de configuración de API Key
+            const apiKeyCard = document.createElement('div');
+            apiKeyCard.classList.add('command-card', 'api-key-config-card');
+            apiKeyCard.innerHTML = `
+                <i class="fas fa-key"></i>
+                <span>Configurar API Key</span>
+            `;
+            apiKeyCard.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeHelpModal();
+                showApiKeyModal();
+            });
+            generalList.appendChild(apiKeyCard);
+        }
+        
+        // --- Funciones para los botones de acción rápida ---
+        function showCurrentTime() {
+            appendMessage('user', `¿Qué hora es?`);
+            const now = new Date();
+            const time = now.toLocaleTimeString('es-VE');
+            appendMessage('syncronix', `La hora actual es: ${time}.`);
+        }
+
+        function showCurrentDate() {
+            appendMessage('user', `¿Qué fecha es?`);
+            const now = new Date();
+            const date = now.toLocaleDateString('es-VE');
+            appendMessage('syncronix', `La fecha de hoy es: ${date}.`);
+        }
+
+        function showAgendaPrompt() {
+            appendMessage('user', 'Quiero agendar algo');
+            appendMessage('syncronix', `Claro, ¿para qué día quieres agendar la reunión? (ejemplo: 21/07/2025)`);
+            resetStates();
+            scheduling = true;
+            pendingDate = true;
+            tempTask = 'reunión';
+        }
+
+        async function generateActivityIdea() {
+            appendMessage('user', 'Necesito una idea de actividad');
+            const prompt = "Dame una idea de actividad creativa y divertida para un grupo de amigos.";
+            const geminiResponse = await fetchGeminiResponse(prompt);
+            appendMessage('syncronix', geminiResponse);
+        }
+        
+        function toggleQuickActions() {
+            quickActionsContainer.classList.toggle('active');
+        }
+        
+        function hideQuickActions() {
+            quickActionsContainer.classList.remove('active');
+        }
+
+        // Event Listeners
+        window.onload = function() {
+            appendMessage('syncronix', '¡Hola! ¿Cómo te llamas?');
+            userInput.placeholder = "Escribe tu nombre...";
+            userInput.focus();
+            userInput.onkeypress = handleInitialInput;
+            sendButton.onclick = function() { handleInitialInput({key: 'Enter', type: 'click'}); };
+
+            // Event listeners para los nuevos botones de acción rápida
+            toggleQuickActionsButton.addEventListener('click', toggleQuickActions);
+            quickHoraButton.addEventListener('click', showCurrentTime);
+            quickFechaButton.addEventListener('click', showCurrentDate);
+            quickAgendaButton.addEventListener('click', showAgendaPrompt);
+            quickActividadButton.addEventListener('click', generateActivityIdea);
+            helpButton.addEventListener('click', showHelpModal);
+        };
+
+        // Escucha clics en todo el documento para cerrar los comandos si se hace clic fuera
+        document.addEventListener('click', (event) => {
+            if (!quickActionsContainer.contains(event.target) && !toggleQuickActionsButton.contains(event.target)) {
+                hideQuickActions();
+            }
+        });
+        
+        //kei gemini "AIzaSyBI0QxOjdc2-xZmMHE0D1W8Po2Mvg1Sf_8"
+    </script>
+</body>
+</html>
